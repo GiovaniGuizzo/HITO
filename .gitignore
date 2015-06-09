@@ -3,6 +3,9 @@
 ### Project Specific ###
 /*experiment*/
 
+### Java ###
+manifest.mf
+
 ### NetBeans ###
 nbproject/
 build/
