@@ -5,7 +5,8 @@
  */
 package hyperheuristics.operators.crossover;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import jmetal.base.Cluster;
 import jmetal.base.Solution;
 import jmetal.base.operator.crossover.Crossover;
 import jmetal.base.variable.Permutation;
@@ -24,6 +25,20 @@ public class MultiMaskCrossover extends Crossover {
             Solution parent1,
             Solution parent2) throws JMException {
 
+        Solution[] offspring = new Solution[4];
+
+        Solution[] interclusterOffspring = intercluster(parent1, parent2, probability);
+        offspring[0] = interclusterOffspring[0];
+        offspring[1] = interclusterOffspring[1];
+        
+        Solution[] intraClusterOffspring = intracluster(parent1, parent2, probability);
+        offspring[2] = intraClusterOffspring[0];
+        offspring[3] = intraClusterOffspring[1];
+
+        return offspring;
+    } // doCrossover
+    
+    public Solution[] intracluster(Solution parent1, Solution parent2, double probability) throws JMException {
         Solution[] offspring = new Solution[2];
 
         offspring[0] = new Solution(parent1);
@@ -32,41 +47,49 @@ public class MultiMaskCrossover extends Crossover {
         try {
             if (parent1.getDecisionVariables()[0].getVariableType().equals(Class.forName("jmetal.base.variable.Permutation"))) {
                 if (PseudoRandom.randDouble() < probability) {
-                    int permutationLength = ((Permutation) parent1.getDecisionVariables()[0]).getLength();
+                    
+                    int cluster = PseudoRandom.randInt(0, ((Permutation) parent1.getDecisionVariables()[0]).clusters_.size() - 1);
 
-                    int parent1Vector[] = ((Permutation) parent1.getDecisionVariables()[0]).vector_;
-                    int parent2Vector[] = ((Permutation) parent2.getDecisionVariables()[0]).vector_;
-                    int offspring1Vector[] = ((Permutation) offspring[0].getDecisionVariables()[0]).vector_;
-                    Arrays.fill(offspring1Vector, -1);
-                    int offspring2Vector[] = ((Permutation) offspring[1].getDecisionVariables()[0]).vector_;
-                    Arrays.fill(offspring2Vector, -1);
+                    ArrayList<Integer> parent1Vector = ((Permutation) parent1.getDecisionVariables()[0]).clusters_.get(cluster).modules;
+                    ArrayList<Integer> parent2Vector = ((Permutation) parent2.getDecisionVariables()[0]).clusters_.get(cluster).modules;
+                    ArrayList<Integer> offspring1Vector = new ArrayList<>(parent1Vector.size());
+                    for (int i = 0; i < parent1Vector.size(); i++) {
+                        offspring1Vector.add(-1);
+                    }
+                    ArrayList<Integer> offspring2Vector = new ArrayList<>(parent2Vector.size());
+                    for (int i = 0; i < parent2Vector.size(); i++) {
+                        offspring2Vector.add(-1);
+                    }
 
+                    int permutationLength = parent1Vector.size();
                     int[] maskArray = getMaskArray(permutationLength);
                     for (int i = 0; i < maskArray.length; i++) {
                         int mask = maskArray[i];
 
-                        int value1;
-                        int value2;
+                        Integer value1;
+                        Integer value2;
 
                         if (mask == 1) {
-                            value1 = parent1Vector[i];
-                            value2 = parent2Vector[i];
+                            value1 = parent1Vector.get(i);
+                            value2 = parent2Vector.get(i);
                         } else {
-                            value1 = parent2Vector[i];
-                            value2 = parent1Vector[i];
+                            value1 = parent2Vector.get(i);
+                            value2 = parent1Vector.get(i);
                         }
 
-                        if (!arrayContains(offspring1Vector, value1)) {
-                            offspring1Vector[i] = value1;
+                        if (!offspring1Vector.contains(value1)) {
+                            offspring1Vector.set(i, value1);
                         }
 
-                        if (!arrayContains(offspring2Vector, value2)) {
-                            offspring2Vector[i] = value2;
+                        if (!offspring2Vector.contains(value2)) {
+                            offspring2Vector.set(i, value2);
                         }
                     }
 
-                    fulfilArray(offspring1Vector, parent1Vector);
-                    fulfilArray(offspring2Vector, parent2Vector);
+                    fulfilArrayModules(offspring1Vector, parent1Vector);
+                    fulfilArrayModules(offspring2Vector, parent2Vector);
+                    ((Permutation) offspring[0].getDecisionVariables()[0]).clusters_.get(cluster).modules = offspring1Vector;
+                    ((Permutation) offspring[1].getDecisionVariables()[0]).clusters_.get(cluster).modules = offspring2Vector;
 
                 } // if
             } else {
@@ -81,7 +104,79 @@ public class MultiMaskCrossover extends Crossover {
             e.printStackTrace();
         } // if
         return offspring;
-    } // doCrossover
+    }
+
+    public Solution[] intercluster(Solution parent1, Solution parent2, double probability) throws JMException {
+        Solution[] offspring = new Solution[2];
+
+        offspring[0] = new Solution(parent1);
+        offspring[1] = new Solution(parent2);
+
+        try {
+            if (parent1.getDecisionVariables()[0].getVariableType().equals(Class.forName("jmetal.base.variable.Permutation"))) {
+                if (PseudoRandom.randDouble() < probability) {
+                    int permutationLength = ((Permutation) parent1.getDecisionVariables()[0]).getLength();
+
+                    ArrayList<Cluster> parent1Vector = ((Permutation) parent1.getDecisionVariables()[0]).clusters_;
+                    ArrayList<Cluster> parent2Vector = ((Permutation) parent2.getDecisionVariables()[0]).clusters_;
+                    ArrayList<Cluster> offspring1Vector = new ArrayList<>(parent1Vector.size());
+                    for (int i = 0; i < parent1Vector.size(); i++) {
+                        offspring1Vector.add(null);
+                    }
+                    ArrayList<Cluster> offspring2Vector = new ArrayList<>(parent2Vector.size());
+                    for (int i = 0; i < parent2Vector.size(); i++) {
+                        offspring2Vector.add(null);
+                    }
+
+                    int[] maskArray = getMaskArray(permutationLength);
+                    for (int i = 0; i < maskArray.length; i++) {
+                        int mask = maskArray[i];
+
+                        Cluster value1;
+                        Cluster value2;
+
+                        if (mask == 1) {
+                            value1 = parent1Vector.get(i);
+                            value2 = parent2Vector.get(i);
+                        } else {
+                            value1 = parent2Vector.get(i);
+                            value2 = parent1Vector.get(i);
+                        }
+
+                        if (!offspring1Vector.contains(value1)) {
+                            Cluster tempCluster = new Cluster();
+                            tempCluster.id = value1.id;
+                            tempCluster.modules = new ArrayList<>(value1.modules);
+                            offspring1Vector.set(i, tempCluster);
+                        }
+
+                        if (!offspring2Vector.contains(value2)) {
+                            Cluster tempCluster = new Cluster();
+                            tempCluster.id = value2.id;
+                            tempCluster.modules = new ArrayList<>(value2.modules);
+                            offspring2Vector.set(i, tempCluster);
+                        }
+                    }
+
+                    fulfilArrayClusters(offspring1Vector, parent1Vector);
+                    fulfilArrayClusters(offspring2Vector, parent2Vector);
+                    ((Permutation) offspring[0].getDecisionVariables()[0]).clusters_ = offspring1Vector;
+                    ((Permutation) offspring[1].getDecisionVariables()[0]).clusters_ = offspring2Vector;
+
+                } // if
+            } else {
+                Configuration.logger_.severe("MultiMaskCrossover.doCrossover: invalid type+"
+                        + "" + parent1.getDecisionVariables()[0].getVariableType());
+                Class cls = java.lang.String.class;
+                String name = cls.getName();
+                throw new JMException("Exception in " + name + ".doCrossover()");
+            } // else
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } // if
+        return offspring;
+    }
 
     /**
      * Executes the operation
@@ -112,12 +207,10 @@ public class MultiMaskCrossover extends Crossover {
         Solution[] offspring = doCrossover(crossoverProbability.doubleValue(), parents[0], parents[1]);
 
         //rever as restricoes---------------------------------------------------
-        int offspring1Vector[] = ((Permutation) offspring[0].getDecisionVariables()[0]).vector_;
-        offspring1Vector = problem.tratarRestricoes(offspring1Vector, problem.getConstraintMatrix());
-
-        //rever as restricoes---------------------------------------------------
-        int offspring2Vector[] = ((Permutation) offspring[1].getDecisionVariables()[0]).vector_;
-        offspring2Vector = problem.tratarRestricoes(offspring2Vector, problem.getConstraintMatrix());
+        offspring[0] = problem.tratarRestricoes(offspring[0], problem.getConstraintMatrix());
+        offspring[1] = problem.tratarRestricoes(offspring[1], problem.getConstraintMatrix());
+        offspring[2] = problem.tratarRestricoes(offspring[2], problem.getConstraintMatrix());
+        offspring[3] = problem.tratarRestricoes(offspring[3], problem.getConstraintMatrix());
 
         return offspring;
     } // execute
@@ -130,26 +223,35 @@ public class MultiMaskCrossover extends Crossover {
         return mask;
     }
 
-    private boolean arrayContains(int[] array, int value) {
-        for (int i : array) {
-            if (i == value) {
-                return true;
+    private void fulfilArrayClusters(ArrayList<Cluster> offspring, ArrayList<Cluster> parent) {
+        int parentIndex = 0;
+        for (int i = 0; i < parent.size(); i++) {
+            Cluster value = offspring.get(i);
+            if (value == null) {
+                Cluster parentValue;
+                do {
+                    parentValue = parent.get(parentIndex);
+                    parentIndex++;
+                } while (offspring.contains(parentValue) && parentIndex < parent.size());
+                Cluster tempCluster = new Cluster();
+                tempCluster.id = parentValue.id;
+                tempCluster.modules = new ArrayList<>(parentValue.modules);
+                offspring.set(i, tempCluster);
             }
         }
-        return false;
     }
-
-    private void fulfilArray(int[] offspring, int[] parent) {
+    
+    private void fulfilArrayModules(ArrayList<Integer> offspring, ArrayList<Integer> parent) {
         int parentIndex = 0;
-        for (int i = 0; i < parent.length; i++) {
-            int value = offspring[i];
-            if (value == -1) {
-                int parentValue;
+        for (int i = 0; i < parent.size(); i++) {
+            Integer value = offspring.get(i);
+            if (value == null) {
+                Integer parentValue;
                 do {
-                    parentValue = parent[parentIndex];
+                    parentValue = parent.get(parentIndex);
                     parentIndex++;
-                } while (arrayContains(offspring, parentValue) && parentIndex < parent.length);
-                offspring[i] = parentValue;
+                } while (offspring.contains(parentValue) && parentIndex < parent.size());
+                offspring.set(i, parentValue);
             }
         }
     }

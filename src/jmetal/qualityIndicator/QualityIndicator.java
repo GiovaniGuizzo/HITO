@@ -31,7 +31,7 @@ public class QualityIndicator {
   public QualityIndicator(Problem problem, String paretoFrontFile) {
     problem_ = problem ;
     utilities_ = new jmetal.qualityIndicator.util.MetricsUtil() ;
-    trueParetoFront_ = utilities_.readNonDominatedSolutionSet(paretoFrontFile);
+    trueParetoFront_ = utilities_.readNonDominatedSolutionSet(paretoFrontFile);    
     trueParetoFrontHypervolume_ = new Hypervolume().hypervolume(
                  trueParetoFront_.writeObjectivesToMatrix(),   
                  trueParetoFront_.writeObjectivesToMatrix(),

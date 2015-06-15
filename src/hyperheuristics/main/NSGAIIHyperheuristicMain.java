@@ -16,7 +16,7 @@ import jmetal.base.operator.mutation.Mutation;
 import jmetal.base.operator.mutation.MutationFactory;
 import jmetal.base.operator.selection.SelectionFactory;
 import jmetal.problems.CITO_CAITO;
-import jmetal.problems.Combined2Objetives;
+import jmetal.problems.Combined2Objectives;
 import jmetal.problems.Combined4Objectives;
 import jmetal.util.JMException;
 
@@ -166,7 +166,7 @@ public class NSGAIIHyperheuristicMain {
             Operator selection; // Selection operator
 
             if (numberOfObjectives == 2) {
-                problem = new Combined2Objetives("problemas/" + problemName + ".txt");
+                problem = new Combined2Objectives("problemas/" + problemName + ".txt");
             } else if (numberOfObjectives == 4) {
                 problem = new Combined4Objectives("problemas/" + problemName + ".txt");
             } else {

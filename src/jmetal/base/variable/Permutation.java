@@ -1,113 +1,92 @@
-/**
- * Permutation.java
- *
- * @author juanjo durillo
- * @version 1.0
- */
 package jmetal.base.variable;
 
 import java.util.ArrayList;
+import jmetal.base.Cluster;
 import jmetal.base.Variable;
 import jmetal.problems.CITO_CAITO;
-import jmetal.util.Configuration.*;
 
-/**
- * Implements a permutation of integer decision variable
- */
 public class Permutation extends Variable {
 
-    /**
-     * Stores a permutation of <code>int</code> values
-     */
-    public int[] vector_;
-    /**
-     * Stores the length of the permutation
-     */
+    public ArrayList<Cluster> clusters_;
     public int size_;
 
-    /**
-     * Constructor
-     */
     public Permutation() {
         size_ = 0;
-        vector_ = null;
+        clusters_ = null;
+    }
 
-    } //Permutation
-
-    /**
-     * Constructor
-     * @param size Length of the permutation
-     * This constructor has been contributed by Madan Sathe
-     */
     public Permutation(CITO_CAITO problem, int var) {
         size_ = problem.getLength(var);
-        vector_ = new int[size_];
+        clusters_ = new ArrayList<Cluster>();
 
-        ArrayList<Integer> randomSequence = new ArrayList<Integer>(size_);
-
-        for (int i = 0; i < size_; i++) {
-            randomSequence.add(i);
+        for (int i = 0; i < problem.clusters_.size(); i++) {
+            Cluster cluster = new Cluster();
+            cluster.id = i;
+            for (int j = 0; j < problem.clusters_.get(i).size(); j++) {
+                cluster.modules.add(problem.clusters_.get(i).get(j));
+            }
+            clusters_.add(cluster);
         }
 
-        java.util.Collections.shuffle(randomSequence);
-
-        for (int j = 0; j < randomSequence.size(); j++) {
-            vector_[j] = randomSequence.get(j);
+        for (int i = 0; i < problem.clusters_.size(); i++) {
+            java.util.Collections.shuffle(clusters_.get(i).modules);
         }
+        java.util.Collections.shuffle(clusters_);
+    }
 
-        //tratar restricoes de precedencia
-        vector_ = problem.tratarRestricoes(vector_, problem.getConstraintMatrix());
-
-//        System.out.print("Initialized: \n");
-//        for (int indexSolution = 0; indexSolution < size_; indexSolution++) {
-//            System.out.print(vector_[indexSolution] + " ");
-//        }
-//        System.out.println("\n");
-
-    } // Constructor
-
-    /**
-     * Copy Constructor
-     * @param permutation The permutation to copy
-     */
     public Permutation(Permutation permutation) {
-        size_ = permutation.size_;
-        vector_ = new int[size_];
+        clusters_ = new ArrayList<Cluster>();
 
-        for (int i = 0; i < size_; i++) {
-            vector_[i] = permutation.vector_[i];
+        for (int i = 0; i < permutation.clusters_.size(); i++) {
+
+            int id = permutation.clusters_.get(i).id;
+            ArrayList<Integer> modules = permutation.clusters_.get(i).modules;
+
+            ArrayList<Integer> copy = new ArrayList<Integer>();
+            for (int j = 0; j < modules.size(); j++) {
+                copy.add(modules.get(j));
+            }
+
+            Cluster temp = new Cluster();
+//            temp = permutation.clusters_.get(i);
+            temp.id = id;
+            temp.modules = copy;
+
+            clusters_.add(i, temp);
         }
-    } //Permutation
+    }
 
-    /**
-     * Create an exact copy of the <code>Permutation</code> object.
-     * @return An exact copy of the object.
-     */
     public Variable deepCopy() {
         return new Permutation(this);
-    } //deepCopy
+    }
 
-    /**
-     * Returns the length of the permutation.
-     * @return The length
-     */
     public int getLength() {
         return size_;
-    } //getNumberOfBits
+    }
+    
+    public Cluster getCluster(int clusterId){
+        for (int i = 0; i < clusters_.size(); i++) {
+            if (clusters_.get(i).id == clusterId) {
+                return clusters_.get(i);
+            }
+        }
 
-    /**
-     * Returns a string representing the object
-     * @return The string
-     */
+        return null;
+    }
+
     @Override
     public String toString() {
         String string;
 
         string = "+";
-        for (int i = 0; i < size_; i++) {
-            string += vector_[i] + " ";
+
+        for (int i = 0; i < clusters_.size(); i++) {
+            for (int j = 0; j < clusters_.get(i).modules.size(); j++) {
+                string += clusters_.get(i).modules.get(j) + " ";
+            }
+            string += "/ ";
         }
 
         return string;
-    } // toString
+    }
 }

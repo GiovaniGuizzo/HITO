@@ -90,13 +90,26 @@ public class SPEA2 extends Algorithm{
           parents[1] = (Solution)selectionOperator.execute(archive, null);
         } while (k < SPEA2.TOURNAMENTS_ROUNDS); // do-while
             
-        //make the crossover 
+        //make the crossover
         Solution [] offSpring = (Solution [])crossoverOperator.execute(parents, problem_);
-        mutationOperator.execute(offSpring[0], problem_);
-        problem_.evaluate(offSpring[0]);
-        problem_.evaluateConstraints(offSpring[0]);            
-        offSpringSolutionSet.add(offSpring[0]);
-        evaluations++;
+
+        for (int l = 0; l < offSpring.length; l++) {
+            mutationOperator.execute(offSpring[l], problem_);
+
+            problem_.evaluate(offSpring[l]);
+            problem_.evaluateConstraints(offSpring[l]);
+
+            offSpringSolutionSet.add(offSpring[l]);
+        }
+
+        evaluations += offSpring.length;
+
+//        mutationOperator.execute(offSpring[0], problem_);
+//        problem_.evaluate(offSpring[0]);
+//        problem_.evaluateConstraints(offSpring[0]);
+//        offSpringSolutionSet.add(offSpring[0]);
+//        evaluations++;
+
       } // while
       // End Create a offSpring solutionSet
       solutionSet = offSpringSolutionSet;                   

@@ -1,0 +1,219 @@
+graph G {
+	graph [fontname=Verdana, fontsize=10]
+	node [label="\N", fontname=Verdana, fontsize=10]
+	subgraph G_component_0 {
+2
+1
+17
+18
+52
+70
+114
+122
+146
+	
+
+	subgraph G_component_1 {
+3
+4
+37
+38
+11
+12
+35
+36
+139
+13
+15
+22
+19
+20
+27
+28
+29
+30
+31
+32
+33
+39
+40
+41
+42
+44
+45
+48
+49
+50
+53
+55
+56
+129
+57
+58
+59
+60
+68
+71
+74
+76
+77
+79
+81
+82
+84
+86
+91
+92
+94
+97
+127
+98
+99
+111
+112
+115
+116
+117
+118
+120
+123
+124
+125
+128
+131
+132
+134
+135
+142
+143
+144
+147
+	
+
+	subgraph G_component_2 {
+5
+137
+6
+8
+113
+141
+	
+
+	subgraph G_component_3 {
+61
+7
+102
+106
+107
+119
+	
+
+	subgraph G_component_4 {
+9
+96
+	
+
+	subgraph G_component_5 {
+10
+95
+14
+51
+69
+75
+78
+85
+105
+108
+121
+145
+	
+
+	subgraph G_component_6 {
+16
+140
+21
+46
+47
+54
+62
+63
+64
+67
+72
+73
+80
+83
+100
+126
+133
+136
+	
+
+	subgraph G_component_7 {
+23
+	
+
+	subgraph G_component_8 {
+24
+25
+	
+
+	subgraph G_component_9 {
+26
+148
+	
+
+	subgraph G_component_10 {
+34
+	
+
+	subgraph G_component_11 {
+43
+	
+
+	subgraph G_component_12 {
+65
+66
+	
+
+	subgraph G_component_13 {
+87
+	
+
+	subgraph G_component_14 {
+88
+	
+
+	subgraph G_component_15 {
+89
+90
+	
+
+	subgraph G_component_16 {
+93
+	
+
+	subgraph G_component_17 {
+101
+	
+
+	subgraph G_component_18 {
+103
+104
+	
+
+	subgraph G_component_19 {
+109
+110
+	
+
+	subgraph G_component_20 {
+130
+	
+
+	subgraph G_component_21 {
+138
+	
+
+
+

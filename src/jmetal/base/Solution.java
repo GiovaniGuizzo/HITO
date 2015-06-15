@@ -8,7 +8,6 @@
 package jmetal.base;
 
 import java.io.Serializable;
-
 import jmetal.base.variable.Binary;
 import jmetal.problems.CITO_CAITO;
 import jmetal.util.Configuration.*;

@@ -71,30 +71,30 @@ public class KruskalWallisTest {
             for (int j = i + 1; j < entrySets.size(); j++) {
                 String entry2 = entrySets.get(j).getKey();
 
-                Scanner scanner = new Scanner(outputFile);
-
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    if (line.contains(entry1 + "-" + entry2)
-                            || line.contains(entry2 + "-" + entry1)) {
-                        HashMap<String, Boolean> entry1Map = result.get(entry1);
-                        if (entry1Map == null) {
-                            entry1Map = new HashMap<>();
-                            result.put(entry1, entry1Map);
-                        }
-                        HashMap<String, Boolean> entry2Map = result.get(entry2);
-                        if (entry2Map == null) {
-                            entry2Map = new HashMap<>();
-                            result.put(entry2, entry2Map);
-                        }
-                        if (line.contains("TRUE")) {
-                            entry1Map.put(entry2, true);
-                            entry2Map.put(entry1, true);
-                            break;
-                        } else if (line.contains("FALSE")) {
-                            entry1Map.put(entry2, false);
-                            entry2Map.put(entry1, false);
-                            break;
+                try (Scanner scanner = new Scanner(outputFile)) {
+                    while (scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+                        if (line.contains(entry1 + "-" + entry2)
+                                || line.contains(entry2 + "-" + entry1)) {
+                            HashMap<String, Boolean> entry1Map = result.get(entry1);
+                            if (entry1Map == null) {
+                                entry1Map = new HashMap<>();
+                                result.put(entry1, entry1Map);
+                            }
+                            HashMap<String, Boolean> entry2Map = result.get(entry2);
+                            if (entry2Map == null) {
+                                entry2Map = new HashMap<>();
+                                result.put(entry2, entry2Map);
+                            }
+                            if (line.contains("TRUE")) {
+                                entry1Map.put(entry2, true);
+                                entry2Map.put(entry1, true);
+                                break;
+                            } else if (line.contains("FALSE")) {
+                                entry1Map.put(entry2, false);
+                                entry2Map.put(entry1, false);
+                                break;
+                            }
                         }
                     }
                 }

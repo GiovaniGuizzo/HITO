@@ -1,0 +1,37 @@
+-------------- OA_AJHotDraw  ---------------
+o módulo [100] depende de [104]
+o módulo [11] depende de [10]
+o módulo [114] depende de [278]
+o módulo [22] depende de [9]
+o módulo [222] depende de [99]
+o módulo [156] depende de [155]
+o módulo [99] depende de [104]
+o módulo [140] depende de [118]
+o módulo [313] depende de [55]
+
+o módulo [100] depende de [104]
+o módulo [8] depende de [292]
+o módulo [313] depende de [55]
+o módulo [140] depende de [118]
+o módulo [193] depende de [100]
+o módulo [67] depende de [278]
+o módulo [146] depende de [200]
+o módulo [285] depende de [284]
+o módulo [99] depende de [104]
+
+o módulo [100] depende de [104]
+o módulo [178] depende de [278]
+o módulo [68] depende de [278]
+o módulo [307] depende de [8]
+o módulo [224] depende de [177]
+o módulo [218] depende de [101]
+o módulo [67] depende de [278]
+o módulo [201] depende de [207]
+o módulo [99] depende de [104]
+
+-------------- OA_AJHsqldb  ---------------
+ok
+-------------- OA_TollSystems  ---------------
+ok
+-------------- OO_BCEL  ---------------
+ok

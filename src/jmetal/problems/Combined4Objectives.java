@@ -2,6 +2,7 @@ package jmetal.problems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import jmetal.base.*;
 import jmetal.base.solutionType.PermutationSolutionType;
 import jmetal.base.variable.Permutation;
@@ -31,44 +32,28 @@ public class Combined4Objectives extends CITO_CAITO {
         double fitness1 = 0.0;
         double fitness2 = 0.0;
         double fitness3 = 0.0;
-        boolean verificador;
-        int x;
-        int y;
+        ArrayList<Integer> alreadyComputedModules = new ArrayList();
+        ArrayList<Cluster> clusters = ((Permutation) solution.getDecisionVariables()[0]).clusters_;
 
-        //percorre o vetor de solucoes
-        for (int i = 0; i < numberOfElements_; i++) {
+        for (int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+            for (int moduleIndex = 0; moduleIndex < clusters.get(clusterIndex).modules.size(); moduleIndex++) {
+                int moduleId = clusters.get(clusterIndex).modules.get(moduleIndex);
 
-            //pega o id da classe
-            x = ((Permutation) solution.getDecisionVariables()[0]).vector_[i];
+                for (int dependencyModuleId = 0; dependencyModuleId < numberOfElements_; dependencyModuleId++) {
+                    if (dependency_matrix_[moduleId][dependencyModuleId] == 1) {
 
-            //percorre as colunas da matrix de dependencia
-            for (int k = 0; k < numberOfElements_; k++) {
-
-                //verifica se existe dependencia de x para k
-                if (dependency_matrix_[x][k] == 1) {
-                    verificador = false;
-
-                    //verifica se a classe já exite
-                    for (int j = 0; j <= i; j++) {
-                        y = ((Permutation) solution.getDecisionVariables()[0]).vector_[j];
-                        if (y == k) {
-                            verificador = true;
+                        if (alreadyComputedModules.indexOf(dependencyModuleId) == -1) {
+                            fitness0 += attribute_coupling_matrix_[moduleId][dependencyModuleId];
+                            fitness1 += method_coupling_matrix_[moduleId][dependencyModuleId];
+                            fitness2 += method_return_type_matrix_[moduleId][dependencyModuleId];
+                            fitness3 += method_param_type_matrix_[moduleId][dependencyModuleId];
                         }
                     }
-
-                    //adiciona os valores ao fitnesse se a classe não tiver sido testada ainda
-                    if (verificador == false) {
-                        fitness0 += attribute_coupling_matrix_[x][k];
-                        fitness1 += method_coupling_matrix_[x][k];
-                        fitness2 += method_return_type_matrix_[x][k];
-                        fitness3 += method_param_type_matrix_[x][k];
-
-                    }
                 }
+
+                alreadyComputedModules.add(moduleId);
             }
         }
-
-        //System.out.println(fitness0+" "+fitness1+" "+fitness2+" "+fitness3);
 
         solution.setObjective(0, fitness0);
         solution.setObjective(1, fitness1);

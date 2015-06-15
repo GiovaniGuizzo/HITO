@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import jmetal.base.SolutionSet;
-import jmetal.qualityIndicator.Coverage;
 import jmetal.qualityIndicator.GenerationalDistance;
 import jmetal.qualityIndicator.InvertedGenerationalDistance;
 import jmetal.qualityIndicator.Spread;
@@ -62,13 +61,11 @@ public class ComputeIndicators {
         InvertedGenerationalDistance igd = new InvertedGenerationalDistance();
         GenerationalDistance gd = new GenerationalDistance();
         Spread spread = new Spread();
-        Coverage coverage = new Coverage();
 
         for (int objectives : numberOfObjectivesArray) {
             try (FileWriter IGDWriter = new FileWriter("experiment/IGD_" + objectives + ".tex");
                     FileWriter spreadWriter = new FileWriter("experiment/SPREAD_" + objectives + ".tex");
-                    FileWriter GDWriter = new FileWriter("experiment/GD_" + objectives + ".tex");
-                    FileWriter coverageWriter = new FileWriter("experiment/COVERAGE_" + objectives + ".tex")) {
+                    FileWriter GDWriter = new FileWriter("experiment/GD_" + objectives + ".tex")) {
 
                 StringBuilder latexTableBuilder = new StringBuilder();
 
@@ -148,20 +145,17 @@ public class ComputeIndicators {
                         HashMap<String, Double> igdMap = new HashMap<>();
                         HashMap<String, Double> gdMap = new HashMap<>();
                         HashMap<String, Double> spreadMap = new HashMap<>();
-                        HashMap<String, Double> coverageMap = new HashMap<>();
 
                         for (String algorithm : algorithms) {
                             double[][] mecbaFront = metricsUtil.readFront("resultado/" + algorithm.toLowerCase().replaceAll("-", "") + "/" + problem + "_Comb_" + objectives + "obj/All_FUN_" + algorithm.toLowerCase().replaceAll("-", "") + "-" + problem);
                             igdMap.put(algorithm, igd.invertedGenerationalDistance(mecbaFront, trueFrontMatrix, objectives));
                             gdMap.put(algorithm, gd.generationalDistance(mecbaFront, trueFrontMatrix, objectives));
                             spreadMap.put(algorithm, spread.spread(mecbaFront, trueFrontMatrix, objectives));
-                            coverageMap.put(algorithm, coverage.coverage(mecbaFront, trueFrontMatrix));
                             for (String heuristic : heuristicFunctions) {
                                 double[][] heuristicFront = metricsUtil.readFront("experiment/" + algorithm + "/" + objectives + "objectives/" + heuristic + "/" + problem + "/FUN.txt");
                                 igdMap.put(algorithm + "-" + heuristic, igd.invertedGenerationalDistance(heuristicFront, trueFrontMatrix, objectives));
                                 gdMap.put(algorithm + "-" + heuristic, gd.generationalDistance(heuristicFront, trueFrontMatrix, objectives));
                                 spreadMap.put(algorithm + "-" + heuristic, spread.spread(heuristicFront, trueFrontMatrix, objectives));
-                                coverageMap.put(algorithm + "-" + heuristic, coverage.coverage(heuristicFront, trueFrontMatrix));
                             }
                         }
 
@@ -178,25 +172,21 @@ public class ComputeIndicators {
                         IGDWriter.write(latexTable.replaceAll("INDICATOR", "IGD"));
                         spreadWriter.write(latexTable.replaceAll("INDICATOR", "Spread"));
                         GDWriter.write(latexTable.replaceAll("INDICATOR", "GD"));
-                        coverageWriter.write(latexTable.replaceAll("INDICATOR", "Coverage"));
 
                         String bestHeuristicIGD = "NULL";
                         String bestHeuristicGD = "NULL";
                         String bestHeuristicSpread = "NULL";
-                        String bestHeuristicCoverage = "NULL";
 
                         getBest:
                         {
                             double bestMeanIGD = Double.POSITIVE_INFINITY;
                             double bestMeanGD = Double.POSITIVE_INFINITY;
                             double bestMeanSpread = Double.NEGATIVE_INFINITY;
-                            double bestMeanCoverage = Double.NEGATIVE_INFINITY;
 
                             for (String heuristic : igdMap.keySet()) {
                                 double heuristicIGD = igdMap.get(heuristic);
                                 double heuristicGD = gdMap.get(heuristic);
                                 double heuristicSpread = spreadMap.get(heuristic);
-                                double heuristicCoverage = coverageMap.get(heuristic);
 
                                 if (heuristicIGD < bestMeanIGD) {
                                     bestMeanIGD = heuristicIGD;
@@ -210,17 +200,12 @@ public class ComputeIndicators {
                                     bestMeanSpread = heuristicSpread;
                                     bestHeuristicSpread = heuristic;
                                 }
-                                if (heuristicCoverage > bestMeanCoverage) {
-                                    bestMeanCoverage = heuristicCoverage;
-                                    bestHeuristicCoverage = heuristic;
-                                }
                             }
                         }
 
                         StringBuilder igdBuilder = new StringBuilder();
                         StringBuilder gdBuilder = new StringBuilder();
                         StringBuilder spreadBuilder = new StringBuilder();
-                        StringBuilder coverageBuilder = new StringBuilder();
 
                         String[] newHeuristicFunctions = new String[heuristicFunctions.length * algorithms.length + algorithms.length];
                         fulfillNewHeuristics:
@@ -264,22 +249,11 @@ public class ComputeIndicators {
                             if (bold) {
                                 spreadBuilder.append("}");
                             }
-
-                            coverageBuilder.append(" & ");
-                            bold = heuristic.equals(bestHeuristicCoverage) || coverageMap.get(heuristic).equals(coverageMap.get(bestHeuristicCoverage));
-                            if (bold) {
-                                coverageBuilder.append("\\textbf{");
-                            }
-                            coverageBuilder.append(decimalFormatter.format(coverageMap.get(heuristic)));
-                            if (bold) {
-                                coverageBuilder.append("}");
-                            }
                         }
 
                         IGDWriter.write(igdBuilder + "\\\\\n");
                         spreadWriter.write(spreadBuilder + "\\\\\n");
                         GDWriter.write(gdBuilder + "\\\\\n");
-                        coverageWriter.write(coverageBuilder + "\\\\\n");
                     }
                     latexTableBuilder = new StringBuilder();
 
@@ -342,7 +316,6 @@ public class ComputeIndicators {
                         HashMap<String, double[]> igdMap = new HashMap<>();
                         HashMap<String, double[]> gdMap = new HashMap<>();
                         HashMap<String, double[]> spreadMap = new HashMap<>();
-                        HashMap<String, double[]> coverageMap = new HashMap<>();
 
                         mocaito:
                         {
@@ -350,19 +323,16 @@ public class ComputeIndicators {
                                 double[] mecbaIGDs = new double[EXECUTIONS];
                                 double[] mecbaGDs = new double[EXECUTIONS];
                                 double[] mecbaSpreads = new double[EXECUTIONS];
-                                double[] mecbaCoverages = new double[EXECUTIONS];
                                 for (int i = 0; i < EXECUTIONS; i++) {
                                     double[][] mecbaFront = metricsUtil.readFront("resultado/" + algorithm.toLowerCase().replaceAll("-", "") + "/" + problem + "_Comb_" + objectives + "obj/FUN_" + algorithm.toLowerCase().replaceAll("-", "") + "-" + problem + "-" + i + ".NaoDominadas");
 
                                     mecbaIGDs[i] = igd.invertedGenerationalDistance(mecbaFront, trueFrontMatrix, objectives);
                                     mecbaGDs[i] = gd.generationalDistance(mecbaFront, trueFrontMatrix, objectives);
                                     mecbaSpreads[i] = spread.spread(mecbaFront, trueFrontMatrix, objectives);
-                                    mecbaCoverages[i] = coverage.coverage(mecbaFront, trueFrontMatrix);
                                 }
                                 igdMap.put(algorithm, mecbaIGDs);
                                 gdMap.put(algorithm, mecbaGDs);
                                 spreadMap.put(algorithm, mecbaSpreads);
-                                coverageMap.put(algorithm, mecbaCoverages);
                             }
                         }
 
@@ -371,26 +341,22 @@ public class ComputeIndicators {
                                 double[] hhIGDs = new double[EXECUTIONS];
                                 double[] hhGDs = new double[EXECUTIONS];
                                 double[] hhSpreads = new double[EXECUTIONS];
-                                double[] hhCoverages = new double[EXECUTIONS];
                                 for (int i = 0; i < EXECUTIONS; i++) {
                                     double[][] hhFront = metricsUtil.readFront("experiment/" + algorithm + "/" + objectives + "objectives/" + heuristic + "/" + problem + "/EXECUTION_" + i + "/FUN.txt");
 
                                     hhIGDs[i] = igd.invertedGenerationalDistance(hhFront, trueFrontMatrix, objectives);
                                     hhGDs[i] = gd.generationalDistance(hhFront, trueFrontMatrix, objectives);
                                     hhSpreads[i] = spread.spread(hhFront, trueFrontMatrix, objectives);
-                                    hhCoverages[i] = coverage.coverage(hhFront, trueFrontMatrix);
                                 }
                                 igdMap.put(algorithm + "-" + heuristic, hhIGDs);
                                 gdMap.put(algorithm + "-" + heuristic, hhGDs);
                                 spreadMap.put(algorithm + "-" + heuristic, hhSpreads);
-                                coverageMap.put(algorithm + "-" + heuristic, hhCoverages);
                             }
                         }
 
                         HashMap<String, HashMap<String, Boolean>> igdResult = KruskalWallisTest.test(igdMap);
                         HashMap<String, HashMap<String, Boolean>> gdResult = KruskalWallisTest.test(gdMap);
                         HashMap<String, HashMap<String, Boolean>> spreadResult = KruskalWallisTest.test(spreadMap);
-                        HashMap<String, HashMap<String, Boolean>> coverageResult = KruskalWallisTest.test(coverageMap);
 
                         latexTableBuilder.append("\t\t").append(problem);
 
@@ -402,27 +368,23 @@ public class ComputeIndicators {
                         IGDWriter.write(latexTable.replaceAll("INDICATOR", "IGD"));
                         spreadWriter.write(latexTable.replaceAll("INDICATOR", "Spread"));
                         GDWriter.write(latexTable.replaceAll("INDICATOR", "GD"));
-                        coverageWriter.write(latexTable.replaceAll("INDICATOR", "Coverage"));
 
                         latexTableBuilder = new StringBuilder();
 
                         String bestHeuristicIGD = "NULL";
                         String bestHeuristicGD = "NULL";
                         String bestHeuristicSpread = "NULL";
-                        String bestHeuristicCoverage = "NULL";
 
                         getBest:
                         {
                             double bestMeanIGD = Double.POSITIVE_INFINITY;
                             double bestMeanGD = Double.POSITIVE_INFINITY;
                             double bestMeanSpread = Double.NEGATIVE_INFINITY;
-                            double bestMeanCoverage = Double.NEGATIVE_INFINITY;
 
                             for (String heuristic : igdMap.keySet()) {
                                 double heuristicMeanIGD = mean.evaluate(igdMap.get(heuristic));
                                 double heuristicMeanGD = mean.evaluate(gdMap.get(heuristic));
                                 double heuristicMeanSpread = mean.evaluate(spreadMap.get(heuristic));
-                                double heuristicMeanCoverage = mean.evaluate(coverageMap.get(heuristic));
 
                                 if (heuristicMeanIGD < bestMeanIGD) {
                                     bestMeanIGD = heuristicMeanIGD;
@@ -436,17 +398,12 @@ public class ComputeIndicators {
                                     bestMeanSpread = heuristicMeanSpread;
                                     bestHeuristicSpread = heuristic;
                                 }
-                                if (heuristicMeanCoverage > bestMeanCoverage) {
-                                    bestMeanCoverage = heuristicMeanCoverage;
-                                    bestHeuristicCoverage = heuristic;
-                                }
                             }
                         }
 
                         StringBuilder igdBuilder = new StringBuilder();
                         StringBuilder gdBuilder = new StringBuilder();
                         StringBuilder spreadBuilder = new StringBuilder();
-                        StringBuilder coverageBuilder = new StringBuilder();
 
                         String[] newHeuristicFunctions = new String[heuristicFunctions.length * algorithms.length + algorithms.length];
                         fulfillNewHeuristics:
@@ -490,22 +447,11 @@ public class ComputeIndicators {
                             if (bold) {
                                 spreadBuilder.append("}");
                             }
-
-                            coverageBuilder.append(" & ");
-                            bold = heuristic.equals(bestHeuristicCoverage) || !coverageResult.get(heuristic).get(bestHeuristicCoverage);
-                            if (bold) {
-                                coverageBuilder.append("\\textbf{");
-                            }
-                            coverageBuilder.append(decimalFormatter.format(mean.evaluate(coverageMap.get(heuristic)))).append(" (").append(decimalFormatter.format(standardDeviation.evaluate(coverageMap.get(heuristic)))).append(")");
-                            if (bold) {
-                                coverageBuilder.append("}");
-                            }
                         }
 
                         IGDWriter.write(igdBuilder + "\\\\\n");
                         spreadWriter.write(spreadBuilder + "\\\\\n");
                         GDWriter.write(gdBuilder + "\\\\\n");
-                        coverageWriter.write(coverageBuilder + "\\\\\n");
                     }
                     latexTableBuilder
                             .append("\t\t\\bottomrule\n")
@@ -521,7 +467,6 @@ public class ComputeIndicators {
                 IGDWriter.write(latexTable);
                 spreadWriter.write(latexTable);
                 GDWriter.write(latexTable);
-                coverageWriter.write(latexTable);
             }
         }
     }

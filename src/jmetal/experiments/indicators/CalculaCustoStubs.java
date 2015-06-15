@@ -314,8 +314,6 @@ public class CalculaCustoStubs {
     //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
 
     public void evaluateSolution(int[] vector) {
-        double fitness0 = 0.0;
-        double fitness1 = 0.0;
         boolean verificador;
         int x, y;
         int totalGeneral = 0, totalClasses = 0, totalAspects = 0;
@@ -337,7 +335,7 @@ public class CalculaCustoStubs {
 
                     verificador = false;
 
-                    //verifica se a classe já exite
+                    //verifica se a classe ja exite
                     for (int j = 0; j <= i; j++) {
                         y = vector[j];
                         if (y == k) {
@@ -347,13 +345,11 @@ public class CalculaCustoStubs {
 
                     //adiciona os valores ao fitnesse se a classe não tiver sido testada ainda
                     if (verificador == false) {
-                        fitness0 += attribute_coupling_matrix_[x][k];
-                        fitness1 += method_coupling_matrix_[x][k];
 
-//                        System.out.print(
-//                                "Criar Stub de [" + k + "] para [" + x + "]  ("
-//                                + "A=" + attribute_coupling_matrix_[x][k] + ", "
-//                                + "M=" + method_coupling_matrix_[x][k] + ")");
+                        System.out.println(
+                                "Criar Stub de [" + k + "] para [" + x + "]  ("
+                                + "A=" + attribute_coupling_matrix_[x][k] + ", "
+                                + "M=" + method_coupling_matrix_[x][k] + ")");
 
                         if (this.aspects_.indexOf(x) > -1) {
 //                            System.out.print(" --> ASPECT");
@@ -386,7 +382,6 @@ public class CalculaCustoStubs {
         }
 
         System.out.println();
-        System.out.println("Cost: A=" + fitness0 + ", O=" + fitness1);
         System.out.println("General Stubs = " + totalGeneral);
         System.out.println("Class Stubs   = " + totalClasses + " (A=" + attributesClasses + ", O=" + operationClasses + ", R=" + returnClasses + ", P=" + paramClasses + ")");
         System.out.println("Aspect Stubs  = " + totalAspects + " (A=" + attributesAspects + ", O=" + operationAspects + ", R=" + returnAspects + ", P=" + paramAspects + ")");

@@ -2,40 +2,29 @@ package jmetal.problems;
 
 import java.util.ArrayList;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StreamTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jmetal.base.*;
-import jmetal.experiments.Experiment;
-import jmetal.qualityIndicator.QualityIndicator;
+import jmetal.base.variable.Permutation;
 
 public class CITO_CAITO extends Problem {
 
-    public int[][] constraint_matrix_;
-    public ArrayList<Integer> aspects_;
     public int numberOfElements_;
+    public int[][] constraint_matrix_;
     public int[][] dependency_matrix_;
     public int[][] attribute_coupling_matrix_;
     public int[][] method_coupling_matrix_;
     public int[][] method_return_type_matrix_;
     public int[][] method_param_type_matrix_;
+    public ArrayList<Integer> aspects_;
+    public ArrayList<ArrayList<Integer>> clusters_;
 
     //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
     public void evaluate(Solution solution) {
-    }
-
-    //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    public int[][] getStrategy() {
-        return constraint_matrix_;
     }
 
     //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
@@ -94,6 +83,7 @@ public class CITO_CAITO extends Problem {
                         if ((token.sval.compareTo("I") == 0) || (token.sval.compareTo("It") == 0) || (token.sval.compareTo("Ag") == 0)) {
                             // I, It, Ag = constraint
                             constraint_matrix_[line][row] = 1;
+//                            System.out.println((line+1)+" -> "+(row+1)+';');
                         }
                     }
                     token.nextToken();
@@ -227,14 +217,30 @@ public class CITO_CAITO extends Problem {
                 token.nextToken();
             }
 
-            // Show matrixes ---------------------------------------------------
-//            this.showDepedencyMatrix();
-//            this.showAttributeMatrix();
-//            this.showMethodMatrix();
-//            this.showMethodReturnTypeMatrix();
-//            this.showMethodParamTypeMatrix();
-//            this.showConstraintMatrix();
-//            System.out.println("Aspects: "+aspects_.toString() );
+            // Find the string CLUSTERS ---------------------------------
+            while (true) {
+                if ((token.sval != null) && ((token.sval.compareTo("CLUSTERS") == 0) || (token.sval.compareTo("END") == 0))) {
+                    break;
+                }
+                token.nextToken();
+            }
+            token.nextToken();
+            while (true) {
+                if ((token.sval != null) && (token.sval.compareTo("END") == 0)) {
+                    break;
+                }
+
+                lineNumber = token.lineno();
+                ArrayList<Integer> cluster = new ArrayList<Integer>();
+
+                while (lineNumber == token.lineno()) {
+                    cluster.add(((int) token.nval) - 1);
+                    token.nextToken();
+                }
+
+                clusters_.add(cluster);
+                //System.out.println(cluster);
+            }
 
         } catch (Exception e) {
             System.err.println("CITOProblem.readProblem():" + e);
@@ -252,6 +258,7 @@ public class CITO_CAITO extends Problem {
         this.method_param_type_matrix_ = new int[numberOfElements_][numberOfElements_];
         this.constraint_matrix_ = new int[numberOfElements_][numberOfElements_];
         this.aspects_ = new ArrayList<Integer>();
+        this.clusters_ = new ArrayList<ArrayList<Integer>>();
 
         //initialize matrixes with value 0
         for (int i = 0; i < numberOfElements_; i++) {
@@ -267,108 +274,16 @@ public class CITO_CAITO extends Problem {
     }
 
     //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    private void showDepedencyMatrix() {
-        //SHOW DEPENDENCY
+    private void showMatrix(int mat[][]) {
         int line, row;
-        System.out.print("\n\n---DEPENDENCY ---\n");
+        System.out.print("\n\n--- --- --- --- --- ---\n");
         for (int i = 0; i < numberOfElements_; i++) {
             line = i + 1;
             System.out.print("[" + line + "] =>");
             for (int j = 0; j < numberOfElements_; j++) {
-                if (this.dependency_matrix_[i][j] != 0) {
+                if (mat[i][j] != 0) {
                     row = j + 1;
-                    System.out.print(" [" + row + ":" + this.dependency_matrix_[i][j] + "]");
-                }
-                //System.out.print("["+this.dependency_matrix_[i][j]+"] ");
-            }
-            System.out.println("");
-        }
-    }
-
-    //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    private void showAttributeMatrix() {
-        //SHOW ATTRIBUTE
-        int line, row;
-        System.out.print("\n\n---ATTRIBUTE ---\n");
-        for (int i = 0; i < numberOfElements_; i++) {
-            line = i + 1;
-            System.out.print("[" + line + "] =>");
-            for (int j = 0; j < numberOfElements_; j++) {
-                if (this.attribute_coupling_matrix_[i][j] != 0) {
-                    row = j + 1;
-                    System.out.print(" [" + row + ":" + this.attribute_coupling_matrix_[i][j] + "]");
-                }
-            }
-            System.out.println("");
-        }
-    }
-
-    //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    private void showMethodMatrix() {
-        //SHOW METHOD
-        int line, row;
-        System.out.print("\n\n---METHOD ---\n");
-        for (int i = 0; i < numberOfElements_; i++) {
-            line = i + 1;
-            System.out.print("[" + line + "] =>");
-            for (int j = 0; j < numberOfElements_; j++) {
-                if (this.method_coupling_matrix_[i][j] != 0) {
-                    row = j + 1;
-                    System.out.print(" [" + row + ":" + this.method_coupling_matrix_[i][j] + "]");
-                }
-            }
-            System.out.println("");
-        }
-    }
-
-    //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    private void showMethodReturnTypeMatrix() {
-        //SHOW METHOD
-        int line, row;
-        System.out.print("\n\n---METHOD RETURN TYPE---\n");
-        for (int i = 0; i < numberOfElements_; i++) {
-            line = i + 1;
-            System.out.print("[" + line + "] =>");
-            for (int j = 0; j < numberOfElements_; j++) {
-                if (this.method_return_type_matrix_[i][j] != 0) {
-                    row = j + 1;
-                    System.out.print(" [" + row + ":" + this.method_return_type_matrix_[i][j] + "]");
-                }
-            }
-            System.out.println("");
-        }
-    }
-
-    //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    private void showMethodParamTypeMatrix() {
-        //SHOW METHOD
-        int line, row;
-        System.out.print("\n\n---METHOD PARAM TYPE---\n");
-        for (int i = 0; i < numberOfElements_; i++) {
-            line = i + 1;
-            System.out.print("[" + line + "] =>");
-            for (int j = 0; j < numberOfElements_; j++) {
-                if (this.method_param_type_matrix_[i][j] != 0) {
-                    row = j + 1;
-                    System.out.print(" [" + row + ":" + this.method_param_type_matrix_[i][j] + "]");
-                }
-            }
-            System.out.println("");
-        }
-    }
-
-    //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    private void showConstraintMatrix() {
-        //SHOW CONSTRAINT
-        int line, row;
-        System.out.print("\n\n---CONSTRAINT ---\n");
-        for (int i = 0; i < numberOfElements_; i++) {
-            line = i + 1;
-            System.out.print("[" + line + "] =>");
-            for (int j = 0; j < numberOfElements_; j++) {
-                if (this.constraint_matrix_[i][j] != 0) {
-                    row = j + 1;
-                    System.out.print(" [" + row + ":" + this.constraint_matrix_[i][j] + "]");
+                    System.out.print(" [" + row + ":" + mat[i][j] + "]");
                 }
             }
             System.out.println("");
@@ -449,103 +364,6 @@ public class CITO_CAITO extends Problem {
     }
 
     //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    public void gravaCompleto(SolutionSet result, String nomeArquivo) {
-        try {
-            FileOutputStream fos = new FileOutputStream("resultado/paes/" + nomeArquivo);
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            BufferedWriter bw = new BufferedWriter(osw);
-
-            int numberOfVariables = result.get(0).getDecisionVariables().length;
-            for (int i = 0; i < result.size(); i++) {
-                for (int j = 0; j < numberOfVariables; j++) {
-                    bw.write(result.get(i).getDecisionVariables()[j].toString() + " - " + result.get(i).toString());
-                }
-                bw.newLine();
-            }
-
-            bw.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Experiment.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    public void geraIndicadores(Problem problem, String file, SolutionSet result) {
-        QualityIndicator indicators;
-        indicators = new QualityIndicator(problem, "resultado/paes/" + file);
-
-        //HV
-        if (true) {
-            double value = indicators.getHypervolume(result);
-            FileWriter os;
-            try {
-                os = new FileWriter("resultado/paes/medidas/HV_paes", true);
-                os.write("" + value + "\n");
-                os.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Experiment.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        //SPREAD
-        if (true) {
-            FileWriter os = null;
-            try {
-                double value = indicators.getSpread(result);
-                os = new FileWriter("resultado/paes/medidas/SPREAD_paes", true);
-                os.write("" + value + "\n");
-                os.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Experiment.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    os.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(Experiment.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-
-        //IGD
-        if (true) {
-            FileWriter os = null;
-            try {
-                double value = indicators.getIGD(result);
-                os = new FileWriter("resultado/paes/medidas/IGD_paes", true);
-                os.write("" + value + "\n");
-                os.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Experiment.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    os.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(Experiment.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-
-        //EPSILON
-        if (true) {
-            FileWriter os = null;
-            try {
-                double value = indicators.getEpsilon(result);
-                os = new FileWriter("resultado/paes/medidas/EPSILON_paes", true);
-                os.write("" + value + "\n");
-                os.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Experiment.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    os.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(Experiment.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
-    //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
     public int[] putEnd(int haystack[], int index) {
         int temp = haystack[index];
 
@@ -559,110 +377,202 @@ public class CITO_CAITO extends Problem {
     }
 
     //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    public int[] putEndCluster(int haystack[], int indexPos, int endPos) {
-        int temp = haystack[indexPos];
+    public Solution putClusterEnd(Solution solution, int clusterIndex) {
+        ArrayList<Cluster> clusters = ((Permutation) solution.getDecisionVariables()[0]).clusters_;
+        Cluster temp = clusters.get(clusterIndex);
 
-        for (int i = indexPos; i < endPos; i++) {
-            haystack[i] = haystack[i + 1];
-        }
+//        System.out.println("cluster [" + clusters.get(clusterIndex).id + "] to end");
+//        System.out.println(clusters);
 
-        haystack[endPos] = temp;
+        clusters.remove(clusterIndex);
+        clusters.add(temp);
 
-        return haystack;
+//        System.out.println(clusters);
+        
+        return solution;
     }
 
     //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    public int[] tratarRestricoes(int vector_[], int contraints_[][]) {
+    public Solution putModuleEnd(Solution solution, int clusterIndex, int moduleIndex) {
+        ArrayList<Cluster> clusters = ((Permutation) solution.getDecisionVariables()[0]).clusters_;
+        int temp = clusters.get(clusterIndex).modules.get(moduleIndex);
 
-        int size_ = vector_.length;
-        ArrayList subVector = new ArrayList();
+//        System.out.println("cluster [" + clusters.get(clusterIndex).id + "] module [" + clusters.get(clusterIndex).modules.get(moduleIndex) + "] to end");
+//        System.out.println(clusters);
 
-        //System.out.println("Tamanho Vetor: " + size_);
+        clusters.get(clusterIndex).modules.remove(moduleIndex);
+        clusters.get(clusterIndex).modules.add(temp);
 
-        for (int indexSolution = 0; indexSolution < size_; indexSolution++) {
-            //pega o id da classe para buscar as restricoes
-            int contraintClassId = vector_[indexSolution];
-            boolean addInSubVector = true;
-            //passa por todas as classes para verificar restricao com a classe atual
-            for (int indexConstraint = 0; indexConstraint < contraints_[contraintClassId].length; indexConstraint++) {
-                //verifica se existe restricao
-                if (contraints_[contraintClassId][indexConstraint] == 1) {
-                    //verifica se a classe exigida já apareceu anteriormente
-                    int x = subVector.indexOf(indexConstraint);
-                    if (x == -1) {
-                        vector_ = this.putEnd(vector_, indexSolution);
-                        addInSubVector = false;
-                        indexSolution--;
-                        break;
-                    }
-                }
-            }
-            //adiciona o elemento no subVector
-            if (addInSubVector) {
-                subVector.add(vector_[indexSolution]);
-            }
-        }
+//        System.out.println(clusters);
 
-        return vector_;
+        return solution;
     }
 
     //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
-    public int[] tratarRestricoesIncremental(int vector_[], int contraints_[][], ArrayList<Integer> aspects) {
+    public Solution tratarRestricoes(Solution solution, int contraints_[][]) {
 
-        int permutationLength = vector_.length;
-        int aspectsLength = aspects.size();
-        int classesClusterEndPos = (permutationLength - aspectsLength) - 1;
-        int aspectsClusterEndPos = permutationLength - 1;
-        int endPos = 0;
+//        System.out.println("iniciou");
+
+        solution = treatConstraintsInsideCluster(solution, contraints_);
+        solution = treatConstraintsAmoungClusters(solution, contraints_);
+
+//        System.out.println(((Permutation) solution.getDecisionVariables()[0]).clusters_);
+//        System.out.println("passou");
+
+        /*
         ArrayList subVector = new ArrayList();
+        ArrayList<Cluster> clusters = ((Permutation) solution.getDecisionVariables()[0]).clusters_;
 
-        for (int indexSolution = 0; indexSolution < permutationLength; indexSolution++) {
-            //pega o id da classe para buscar as restricoes
-            int contraintClassId = vector_[indexSolution];
-            boolean addInSubVector = true;
-            //passa por todas as classes para verificar restricao com a classe atual
-            for (int indexConstraint = 0; indexConstraint < contraints_[contraintClassId].length; indexConstraint++) {
-                //verifica se existe restricao
-                if (contraints_[contraintClassId][indexConstraint] == 1) {
-                    //verifica se a classe exigida já apareceu anteriormente
-                    int x = subVector.indexOf(indexConstraint);
-                    if (x == -1) {
-                        if (indexSolution <= classesClusterEndPos) {
-                            endPos = classesClusterEndPos;
-                        } else if (indexSolution <= aspectsClusterEndPos) {
-                            endPos = aspectsClusterEndPos;
+        for (int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+            for (int moduleIndex = 0; moduleIndex < clusters.get(clusterIndex).modules.size(); moduleIndex++) {
+
+                //pega o id da classe para buscar as restricoes
+                int moduleId = clusters.get(clusterIndex).modules.get(moduleIndex);
+                boolean addInSubVector = true;
+
+                //passa por todas as classes para verificar restricao com a classe atual
+                for (int constraintIndex = 0; constraintIndex < contraints_[moduleId].length; constraintIndex++) {
+                    //verifica se existe restricao
+                    if (contraints_[moduleId][constraintIndex] == 1) {
+                        //verifica se a classe exigida ja apareceu anteriormente
+                        if (subVector.indexOf(constraintIndex) == -1) {
+
+                            System.out.println("");
+                            System.out.println(clusters.get(clusterIndex).modules);
+
+                            boolean constraintInTheSameCluster = false;
+                            for (int clusterModuleIndex = moduleIndex + 1; clusterModuleIndex < clusters.get(clusterIndex).modules.size(); clusterModuleIndex++) {
+                                if (clusters.get(clusterIndex).modules.get(clusterModuleIndex) == constraintIndex) {
+                                    System.out.println(" --- achou --- ");
+                                    constraintInTheSameCluster = true;
+                                }
+                                //System.out.print(clusters.get(clusterIndex).modules.get(clusterModuleIndex)+" ");
+                            }
+                            if (constraintInTheSameCluster) {
+                                solution = this.putModuleEnd(solution, clusterIndex, moduleIndex);
+                                addInSubVector = false;
+                                moduleIndex--;
+                                break;
+                            }
+
                         }
-                        //System.out.println(vector_[indexSolution]+" / "+contraintClassId+" / "+indexConstraint);
-                        vector_ = this.putEndCluster(vector_, indexSolution, endPos);
-                        addInSubVector = false;
-                        indexSolution--;
-                        break;
                     }
                 }
-            }
-            //adiciona o elemento no subVector
-            if (addInSubVector) {
-                subVector.add(vector_[indexSolution]);
+                //adiciona o elemento no subVector
+                if (addInSubVector) {
+                    subVector.add(moduleId);
+                }
+
             }
         }
+         */
 
-        return vector_;
+        return solution;
     }
+
     //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
+    public Solution treatConstraintsInsideCluster(Solution solution, int contraints_[][]) {
 
-    public int[] aspectosNoFimDaOrdem(int vector_[], ArrayList<Integer> aspects) {
+        ArrayList alreadyCheckedModules = new ArrayList();
+        ArrayList<Cluster> clusters = ((Permutation) solution.getDecisionVariables()[0]).clusters_;
 
-        int lastPossition = vector_.length - aspects.size();
+        for (int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+            for (int moduleIndex = 0; moduleIndex < clusters.get(clusterIndex).modules.size(); moduleIndex++) {
 
-        for (int indexSolution = 0; indexSolution < lastPossition; indexSolution++) {
-            if (aspects.indexOf(vector_[indexSolution]) > -1) {
-                //System.out.println("Aspecto foi para o fim: "+vector_[indexSolution]);
-                vector_ = this.putEnd(vector_, indexSolution);
-                indexSolution--;
+                int moduleId = clusters.get(clusterIndex).modules.get(moduleIndex);
+                boolean addInAlreadyCheckedModules = true;
+
+                for (int constraintModuleId = 0; constraintModuleId < contraints_[moduleId].length; constraintModuleId++) {
+                    if (contraints_[moduleId][constraintModuleId] == 1) {
+                        if (alreadyCheckedModules.indexOf(constraintModuleId) == -1) {
+
+                            boolean precedentInTheSameCluster = false;
+
+                            for (int clusterModuleIndex = moduleIndex + 1; clusterModuleIndex < clusters.get(clusterIndex).modules.size(); clusterModuleIndex++) {
+                                if (clusters.get(clusterIndex).modules.get(clusterModuleIndex) == constraintModuleId) {
+                                    precedentInTheSameCluster = true;
+                                }
+                            }
+
+                            if (precedentInTheSameCluster) {
+                                solution = this.putModuleEnd(solution, clusterIndex, moduleIndex);
+                                addInAlreadyCheckedModules = false;
+                                moduleIndex--;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (addInAlreadyCheckedModules) {
+                    alreadyCheckedModules.add(moduleId);
+                }
+
             }
         }
 
-        return vector_;
+        return solution;
+    }
+
+    //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
+    public Solution treatConstraintsAmoungClusters(Solution solution, int contraints_[][]) {
+
+        ArrayList alreadyCheckedModules = new ArrayList();
+        ArrayList<Cluster> clusters = ((Permutation) solution.getDecisionVariables()[0]).clusters_;
+        
+        for (int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
+
+//            System.out.println("clusterIndex " + clusterIndex);
+//            System.out.println("checked "+alreadyCheckedModules);
+            outerloop:
+            for (int moduleIndex = 0; moduleIndex < clusters.get(clusterIndex).modules.size(); moduleIndex++) {
+
+                int moduleId = clusters.get(clusterIndex).modules.get(moduleIndex);
+                boolean addInAlreadyCheckedModules = true;
+
+                for (int constraintModuleId = 0; constraintModuleId < contraints_[moduleId].length; constraintModuleId++) {
+                    if (contraints_[moduleId][constraintModuleId] == 1) {
+                        if (alreadyCheckedModules.indexOf(constraintModuleId) == -1) {
+
+                            boolean precedentInTheSameCluster = false;
+
+                            for (int clusterModuleIndex = moduleIndex + 1; clusterModuleIndex < clusters.get(clusterIndex).modules.size(); clusterModuleIndex++) {
+                                if (clusters.get(clusterIndex).modules.get(clusterModuleIndex) == constraintModuleId) {
+                                    precedentInTheSameCluster = true;
+                                }
+                            }
+
+                            if (!precedentInTheSameCluster) {
+//                            System.out.println("");
+//                            System.out.println("o m�dulo [" + moduleId + "] depende de [" + constraintModuleId + "]");
+//                            System.out.println("    " + moduleId + " ("+ Cluster.getClusterId(clusters, moduleId)+") -> " + constraintModuleId + "("+ Cluster.getClusterId(clusters, constraintModuleId)+");");
+
+//                                System.out.println(alreadyCheckedModules);
+//                                System.out.println("Envia " + clusterIndex + " = [" + clusters.get(clusterIndex).id + "] para o fim");
+
+                                solution = this.putClusterEnd(solution, clusterIndex);
+
+//                                addInAlreadyCheckedModules = false;
+//                                moduleIndex = 0;
+                                clusterIndex = -1;
+//                                System.out.println("checked "+alreadyCheckedModules);
+                                alreadyCheckedModules = new ArrayList();
+
+
+//                                System.out.println("Breaking");
+                                break outerloop;
+                            }
+                        }
+                    }
+                }
+
+                if (addInAlreadyCheckedModules) {
+                    alreadyCheckedModules.add(moduleId);
+                }
+            }
+        }
+
+        return solution;
     }
     //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
 }

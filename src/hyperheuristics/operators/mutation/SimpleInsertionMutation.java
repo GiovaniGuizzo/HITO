@@ -5,6 +5,8 @@
  */
 package hyperheuristics.operators.mutation;
 
+import java.util.ArrayList;
+import jmetal.base.Cluster;
 import jmetal.base.Solution;
 import jmetal.base.operator.mutation.Mutation;
 import jmetal.base.variable.Permutation;
@@ -37,55 +39,65 @@ public class SimpleInsertionMutation extends Mutation {
         }
 
         //rever as restricoes---------------------------------------------------
-        int solutionVector[] = ((Permutation) solution.getDecisionVariables()[0]).vector_;
-        solutionVector = problem.tratarRestricoes(solutionVector, problem.getConstraintMatrix());
+        solution = problem.tratarRestricoes(solution, problem.getConstraintMatrix());
 
 //        System.out.println(solution.getDecisionVariables()[0].toString());
         return solution;
     }
 
     private void doMutation(Solution solution) {
+        if (PseudoRandom.randDouble() > 0.5) {
+            intercluster(solution);
+        } else {
+            intracluster(solution);
+        }
+    }
+
+    private Solution intercluster(Solution solution) {
         try {
             if (solution.getDecisionVariables()[0].getVariableType() == Class.forName("jmetal.base.variable.Permutation")) {
-                int[] decisionVariables = ((Permutation) solution.getDecisionVariables()[0]).vector_;
-                int length = decisionVariables.length;
+                ArrayList<Cluster> clusters = ((Permutation) solution.getDecisionVariables()[0]).clusters_;
+                int length = clusters.size();
 
                 int fromPosition = PseudoRandom.randInt(0, length - 1);
-                int value = decisionVariables[fromPosition];
+                Cluster value = clusters.get(fromPosition);
 
                 int toPosition;
                 do {
                     toPosition = PseudoRandom.randInt(0, length - 1);
                 } while (fromPosition == toPosition);
 
-                int[] newArray = new int[length];
+                ArrayList<Cluster> newArray = new ArrayList<>();
+                for (int i = 0; i < clusters.size(); i++) {
+                    newArray.add(null);
+                }
 
                 int i;
                 if (fromPosition > toPosition) {
                     for (i = 0; i < toPosition; i++) {
-                        newArray[i] = decisionVariables[i];
+                        newArray.set(i, clusters.get(i));
                     }
-                    newArray[i] = value;
+                    newArray.set(i, value);
                     for (i++; i <= fromPosition; i++) {
-                        newArray[i] = decisionVariables[i - 1];
+                        newArray.set(i, clusters.get(i - 1));
                     }
                     for (; i < length; i++) {
-                        newArray[i] = decisionVariables[i];
+                        newArray.set(i, clusters.get(i));
                     }
                 } else {
                     for (i = 0; i < fromPosition; i++) {
-                        newArray[i] = decisionVariables[i];
+                        newArray.set(i, clusters.get(i));
                     }
                     for (; i < toPosition; i++) {
-                        newArray[i] = decisionVariables[i + 1];
+                        newArray.set(i, clusters.get(i + 1));
                     }
-                    newArray[i] = value;
+                    newArray.set(i, value);
                     for (i++; i < length; i++) {
-                        newArray[i] = decisionVariables[i];
+                        newArray.set(i, clusters.get(i));
                     }
                 }
 
-                ((Permutation) solution.getDecisionVariables()[0]).vector_ = newArray;
+                ((Permutation) solution.getDecisionVariables()[0]).clusters_ = newArray;
             } else {
                 Configuration.logger_.severe("SimpleInsertionMutation.doMutation: invalid type+"
                         + "" + solution.getDecisionVariables()[0].getVariableType());
@@ -96,6 +108,66 @@ public class SimpleInsertionMutation extends Mutation {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        return solution;
+    }
+    
+     private Solution intracluster(Solution solution) {
+        try {
+            if (solution.getDecisionVariables()[0].getVariableType() == Class.forName("jmetal.base.variable.Permutation")) {
+                ArrayList<Cluster> clusters = ((Permutation) solution.getDecisionVariables()[0]).clusters_;
+                Cluster cluster = clusters.get(PseudoRandom.randInt(0, clusters.size() - 1));
+                int length = cluster.modules.size();
+
+                int fromPosition = PseudoRandom.randInt(0, length - 1);
+                Integer value = cluster.modules.get(fromPosition);
+
+                int toPosition;
+                do {
+                    toPosition = PseudoRandom.randInt(0, length - 1);
+                } while (fromPosition == toPosition);
+
+                ArrayList<Integer> newArray = new ArrayList<>();
+                for (int i = 0; i < cluster.modules.size(); i++) {
+                    newArray.add(null);
+                }
+
+                int i;
+                if (fromPosition > toPosition) {
+                    for (i = 0; i < toPosition; i++) {
+                        newArray.set(i, cluster.modules.get(i));
+                    }
+                    newArray.set(i, value);
+                    for (i++; i <= fromPosition; i++) {
+                        newArray.set(i, cluster.modules.get(i - 1));
+                    }
+                    for (; i < length; i++) {
+                        newArray.set(i, cluster.modules.get(i));
+                    }
+                } else {
+                    for (i = 0; i < fromPosition; i++) {
+                        newArray.set(i, cluster.modules.get(i));
+                    }
+                    for (; i < toPosition; i++) {
+                        newArray.set(i, cluster.modules.get(i + 1));
+                    }
+                    newArray.set(i, value);
+                    for (i++; i < length; i++) {
+                        newArray.set(i, cluster.modules.get(i));
+                    }
+                }
+
+                cluster.modules = newArray;
+            } else {
+                Configuration.logger_.severe("SimpleInsertionMutation.doMutation: invalid type+"
+                        + "" + solution.getDecisionVariables()[0].getVariableType());
+                Class cls = java.lang.String.class;
+                String name = cls.getName();
+                throw new JMException("Exception in " + name + ".doMutation()");
+            } // else
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return solution;
     }
 
 }

@@ -12,7 +12,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
-import jmetal.qualityIndicator.Coverage;
 import jmetal.qualityIndicator.util.MetricsUtil;
 import jmetal.util.NonDominatedSolutionList;
 
@@ -46,11 +45,9 @@ public class ComputeEffectSize {
 
         MetricsUtil metricsUtil = new MetricsUtil();
         DecimalFormat decimalFormatter = new DecimalFormat("0.00E0");
-        Coverage coverage = new Coverage();
-
         for (int objectives : numberOfObjectivesArray) {
 
-            try (FileWriter hypervolumeTableWriter = new FileWriter("experiment/" + objectives + "objectives/HYPERVOLUME_ES.txt"); FileWriter coverageTableWriter = new FileWriter("experiment/" + objectives + "objectives/COVERAGE_ES.txt")) {
+            try (FileWriter hypervolumeTableWriter = new FileWriter("experiment/" + objectives + "objectives/HYPERVOLUME_ES.txt")) {
 
                 StringBuilder hypervolumeLatexTableBuilder = new StringBuilder();
 
@@ -105,11 +102,8 @@ public class ComputeEffectSize {
                 hypervolumeLatexTableBuilder.append("\\\\\n");
                 hypervolumeLatexTableBuilder.append("\t\t\\midrule\n");
 
-                StringBuilder coverageLatexTableBuilder = new StringBuilder(hypervolumeLatexTableBuilder.toString());
-
                 for (String problem : problems) {
                     hypervolumeLatexTableBuilder.append("\t\t").append(problem.replaceAll("O[OA]\\_", ""));
-                    coverageLatexTableBuilder.append("\t\t").append(problem.replaceAll("O[OA]\\_", ""));
 
                     NonDominatedSolutionList truePareto = new NonDominatedSolutionList();
 
@@ -132,17 +126,13 @@ public class ComputeEffectSize {
                     }
 
                     HashMap<String, double[]> hypervolumeHashMap = new HashMap<>();
-                    HashMap<String, double[]> coverageHashMap = new HashMap<>();
 
                     double[] mecbaHypervolumes = new double[executions];
-                    double[] mecbaCoverages = new double[executions];
                     for (int i = 0; i < executions; i++) {
                         mecbaHypervolumes[i] = hypervolumeHandler.calculateHypervolume(mecbaDirectory + "FUN_nsgaii-" + problem + "-" + i + ".NaoDominadas", objectives);
-                        mecbaCoverages[i] = coverage.coverage(metricsUtil.readFront(mecbaDirectory + "FUN_nsgaii-" + problem + "-" + i + ".NaoDominadas"), truePareto.writeObjectivesToMatrix());
                     }
 
                     hypervolumeHashMap.put("MOEA", mecbaHypervolumes);
-                    coverageHashMap.put("MOEA", mecbaCoverages);
 
                     for (String heuristicFunction : heuristicFunctions) {
                         String path = "experiment/";
@@ -150,19 +140,15 @@ public class ComputeEffectSize {
                         String hyperheuristicDirectory = path + heuristicFunction + "/" + problem + "/";
 
                         double[] hhHypervolumes = new double[executions];
-                        double[] hhCoverages = new double[executions];
 
                         for (int j = 0; j < executions; j++) {
                             hhHypervolumes[j] = hypervolumeHandler.calculateHypervolume(hyperheuristicDirectory + "EXECUTION_" + j + "/FUN.txt", objectives);
-                            hhCoverages[j] = coverage.coverage(metricsUtil.readFront(hyperheuristicDirectory + "EXECUTION_" + j + "/FUN.txt"), truePareto.writeObjectivesToMatrix());
                         }
 
                         hypervolumeHashMap.put(heuristicFunction, hhHypervolumes);
-                        coverageHashMap.put(heuristicFunction, hhCoverages);
                     }
 
                     HashMap<String, HashMap<String, Double>> hypervolumeEffectSize = EffectSize.computeEffectSize(hypervolumeHashMap);
-                    HashMap<String, HashMap<String, Double>> coverageEffectSize = EffectSize.computeEffectSize(coverageHashMap);
 
                     String[] newHeuristicFunctions = new String[heuristicFunctions.length + 1];
                     newHeuristicFunctions[0] = "MOEA";
@@ -172,16 +158,13 @@ public class ComputeEffectSize {
                         String groupA = newHeuristicFunctions[i];
                         for (int j = i + 1; j < newHeuristicFunctions.length; j++) {
                             String groupB = newHeuristicFunctions[j];
-                            
+
                             double hypervolumeValue = hypervolumeEffectSize.get(groupA).get(groupB);
-                            double coverageValue = coverageEffectSize.get(groupA).get(groupB);
 
                             hypervolumeLatexTableBuilder.append(" & ").append(decimalFormatter.format(hypervolumeValue)).append(" (").append(EffectSize.interpretEffectSize(hypervolumeValue)).append(")");
-                            coverageLatexTableBuilder.append(" & ").append(decimalFormatter.format(coverageValue)).append(" (").append(EffectSize.interpretEffectSize(coverageValue)).append(")");
                         }
                     }
                     hypervolumeLatexTableBuilder.append("\\\\\n");
-                    coverageLatexTableBuilder.append("\\\\\n");
                 }
 
                 hypervolumeLatexTableBuilder
@@ -189,14 +172,8 @@ public class ComputeEffectSize {
                         .append("\t\\end{tabulary}\n")
                         .append("\\end{table*}\n")
                         .append("\\end{document}");
-                coverageLatexTableBuilder
-                        .append("\t\t\\bottomrule\n")
-                        .append("\t\\end{tabulary}\n")
-                        .append("\\end{table*}\n")
-                        .append("\\end{document}");
-                
+
                 hypervolumeTableWriter.write(hypervolumeLatexTableBuilder.toString().replaceAll("ChoiceFunction", "HITO-CF").replaceAll("MultiArmedBandit", "HITO-MAB").replaceAll("Random", "HITO-R"));
-                coverageTableWriter.write(coverageLatexTableBuilder.toString().replaceAll("ChoiceFunction", "HITO-CF").replaceAll("MultiArmedBandit", "HITO-MAB").replaceAll("Random", "HITO-R"));
             }
         }
     }
