@@ -35,12 +35,12 @@ public class GenerateTimesAppliedTables {
         };
         String[] heuristicFunctions = new String[]{
             LowLevelHeuristic.CHOICE_FUNCTION,
-            LowLevelHeuristic.MULTI_ARMED_BANDIT
+//            LowLevelHeuristic.MULTI_ARMED_BANDIT
         };
 
         String[] algorithms = new String[]{
             "NSGA-II",
-            "SPEA2"
+//            "SPEA2"
         };
 
         DecimalFormat decimalFormat = new DecimalFormat("#.##");

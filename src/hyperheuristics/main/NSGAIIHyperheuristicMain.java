@@ -99,14 +99,14 @@ public class NSGAIIHyperheuristicMain {
                 "OO_BCEL",
                 "OO_JHotDraw",
                 "OA_HealthWatcher",
-                "OA_TollSystems",
+//                "OA_TollSystems",
                 "OO_JBoss"
             };
 
             crossovers = new String[]{
                 "TwoPointsCrossover",
                 "MultiMaskCrossover",
-                "PMXCrossover"
+//                "PMXCrossover"
             };
 
             mutations = new String[]{
@@ -120,15 +120,15 @@ public class NSGAIIHyperheuristicMain {
             crossoverProbability = 1;
             mutationProbability = 1;
             alpha = 1;
-            beta = 8D / populationSize * 0.125;
+            beta = 0.00005;
 
-            heuristicFunction = LowLevelHeuristic.MULTI_ARMED_BANDIT;
+            heuristicFunction = LowLevelHeuristic.CHOICE_FUNCTION;
 
-            w = populationSize / 2;
+            w = 150;
             c = 5;
-            debug = true;
-            executions = 10;
-            path = "experiment/NSGA-II/";
+            debug = false;
+            executions = 30;
+            path = "experiment/";
         }
 
         String[] temp = new String[mutations.length + 1];
@@ -166,9 +166,9 @@ public class NSGAIIHyperheuristicMain {
             Operator selection; // Selection operator
 
             if (numberOfObjectives == 2) {
-                problem = new Combined2Objectives("problemas/" + problemName + ".txt");
+                problem = new Combined2Objectives("problemas_cluster/" + problemName + ".txt");
             } else if (numberOfObjectives == 4) {
-                problem = new Combined4Objectives("problemas/" + problemName + ".txt");
+                problem = new Combined4Objectives("problemas_cluster/" + problemName + ".txt");
             } else {
                 problem = null;
                 System.err.println("Wrong number of objectives (" + numberOfObjectives + "). Available values: 2 or 4.");

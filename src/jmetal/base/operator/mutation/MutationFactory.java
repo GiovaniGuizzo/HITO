@@ -7,8 +7,9 @@
 
 package jmetal.base.operator.mutation;
 
-import java.util.Properties;
-import jmetal.base.operator.mutation.Mutation;
+import hyperheuristics.operators.mutation.InterSimpleInsertionMutation;
+import hyperheuristics.operators.mutation.IntraSimpleInsertionMutation;
+import hyperheuristics.operators.mutation.SimpleInsertionMutation;
 import jmetal.util.Configuration;
 import jmetal.util.JMException;
 
@@ -31,6 +32,16 @@ public class MutationFactory {
       return new BitFlipMutation();
     else if (name.equalsIgnoreCase("SwapMutation"))
       return new SwapMutation();
+    else if (name.equalsIgnoreCase("IntraSwapMutation"))
+      return new IntraSwapMutation();
+    else if (name.equalsIgnoreCase("InterSwapMutation"))
+      return new InterSwapMutation();
+    else if (name.equalsIgnoreCase("SimpleInsertionMutation"))
+      return new SimpleInsertionMutation();
+    else if (name.equalsIgnoreCase("IntraSimpleInsertionMutation"))
+      return new IntraSimpleInsertionMutation();
+    else if (name.equalsIgnoreCase("InterSimpleInsertionMutation"))
+      return new InterSimpleInsertionMutation();
     else
     {
       Configuration.logger_.severe("Operator '" + name + "' not found ");

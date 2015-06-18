@@ -27,11 +27,11 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 public class CompareHypervolumes {
 
     public static int EXECUTIONS = 30;
-    public static String outpath = "experiment/";
+    public static String outpath = "experiment_0.00005/";
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        int[] numberOfObjectivesArray = new int[]{2, 4};
+        int[] numberOfObjectivesArray = new int[]{2};
         String[] problems;
         if (args.length == 0) {
             problems = new String[]{
@@ -52,12 +52,12 @@ public class CompareHypervolumes {
 
         String[] heuristicFunctions = new String[]{
             LowLevelHeuristic.CHOICE_FUNCTION,
-            LowLevelHeuristic.MULTI_ARMED_BANDIT, //            LowLevelHeuristic.RANDOM
+//            LowLevelHeuristic.MULTI_ARMED_BANDIT, //            LowLevelHeuristic.RANDOM
         };
 
         String[] algorithms = new String[]{
             "NSGA-II",
-            "SPEA2"
+//            "SPEA2"
         };
 
         for (int numberOfObjectives : numberOfObjectivesArray) {
@@ -71,7 +71,7 @@ public class CompareHypervolumes {
     private static void generateTables(String[] problems, String[] heuristicFunctions, int numberOfObjectives, String[] algorithms) throws InterruptedException, IOException {
         String outputDirectory = outpath;
 
-        try (FileWriter fileWriter = new FileWriter(outputDirectory + "TABLES_" + numberOfObjectives + ".txt")) {
+        try (FileWriter fileWriter = new FileWriter(outputDirectory + "TABLES_" + numberOfObjectives + ".tex")) {
 
             StringBuilder tableString = new StringBuilder();
             DecimalFormat decimalFormatter = new DecimalFormat("0.00E0");

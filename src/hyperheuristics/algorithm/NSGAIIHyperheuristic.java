@@ -265,6 +265,10 @@ public class NSGAIIHyperheuristic extends Algorithm {
                 problem_.evaluateConstraints(offSpring[0]);
                 problem_.evaluate(offSpring[1]);
                 problem_.evaluateConstraints(offSpring[1]);
+//                problem_.evaluate(offSpring[2]);
+//                problem_.evaluateConstraints(offSpring[2]);
+//                problem_.evaluate(offSpring[3]);
+//                problem_.evaluateConstraints(offSpring[3]);
 
                 //Update rank
                 applyingHeuristic.updateRank(parents, offSpring);
@@ -274,6 +278,8 @@ public class NSGAIIHyperheuristic extends Algorithm {
 
                 offspringPopulation.add(offSpring[0]);
                 offspringPopulation.add(offSpring[1]);
+//                offspringPopulation.add(offSpring[2]);
+//                offspringPopulation.add(offSpring[3]);
 
                 i++;
                 evaluations += 2;

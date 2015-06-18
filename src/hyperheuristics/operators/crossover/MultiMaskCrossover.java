@@ -50,8 +50,8 @@ public class MultiMaskCrossover extends Crossover {
                     
                     int cluster = PseudoRandom.randInt(0, ((Permutation) parent1.getDecisionVariables()[0]).clusters_.size() - 1);
 
-                    ArrayList<Integer> parent1Vector = ((Permutation) parent1.getDecisionVariables()[0]).clusters_.get(cluster).modules;
-                    ArrayList<Integer> parent2Vector = ((Permutation) parent2.getDecisionVariables()[0]).clusters_.get(cluster).modules;
+                    ArrayList<Integer> parent1Vector = ((Permutation) parent1.getDecisionVariables()[0]).getCluster(cluster).modules;
+                    ArrayList<Integer> parent2Vector = ((Permutation) parent2.getDecisionVariables()[0]).getCluster(cluster).modules;
                     ArrayList<Integer> offspring1Vector = new ArrayList<>(parent1Vector.size());
                     for (int i = 0; i < parent1Vector.size(); i++) {
                         offspring1Vector.add(-1);
@@ -88,8 +88,8 @@ public class MultiMaskCrossover extends Crossover {
 
                     fulfilArrayModules(offspring1Vector, parent1Vector);
                     fulfilArrayModules(offspring2Vector, parent2Vector);
-                    ((Permutation) offspring[0].getDecisionVariables()[0]).clusters_.get(cluster).modules = offspring1Vector;
-                    ((Permutation) offspring[1].getDecisionVariables()[0]).clusters_.get(cluster).modules = offspring2Vector;
+                    ((Permutation) offspring[0].getDecisionVariables()[0]).getCluster(cluster).modules = offspring1Vector;
+                    ((Permutation) offspring[1].getDecisionVariables()[0]).getCluster(cluster).modules = offspring2Vector;
 
                 } // if
             } else {
@@ -115,7 +115,7 @@ public class MultiMaskCrossover extends Crossover {
         try {
             if (parent1.getDecisionVariables()[0].getVariableType().equals(Class.forName("jmetal.base.variable.Permutation"))) {
                 if (PseudoRandom.randDouble() < probability) {
-                    int permutationLength = ((Permutation) parent1.getDecisionVariables()[0]).getLength();
+                    int permutationLength = ((Permutation) parent1.getDecisionVariables()[0]).clusters_.size();
 
                     ArrayList<Cluster> parent1Vector = ((Permutation) parent1.getDecisionVariables()[0]).clusters_;
                     ArrayList<Cluster> parent2Vector = ((Permutation) parent2.getDecisionVariables()[0]).clusters_;
@@ -245,7 +245,7 @@ public class MultiMaskCrossover extends Crossover {
         int parentIndex = 0;
         for (int i = 0; i < parent.size(); i++) {
             Integer value = offspring.get(i);
-            if (value == null) {
+            if (value == -1) {
                 Integer parentValue;
                 do {
                     parentValue = parent.get(parentIndex);
