@@ -140,7 +140,7 @@ public class CFMOEAD_FRRHyperheuristicMain {
             nr = 6;
             //beta = 0.10;
             debug = true;
-            executions = 1;
+            executions = 30;
             tipo = 1;
             path = "experiment/MOEAD/";
         }

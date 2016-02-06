@@ -40,7 +40,9 @@ public class Combined_MOEAD_2obj {
             "OO_MyBatis"
         };
 
-        int nr=Integer.parseInt(args[0]);
+        int nr=3;
+        if(args.length==1)
+            nr=Integer.parseInt(args[0]);
         int t = 30;
         double delta = 0.9;
 
