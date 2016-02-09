@@ -331,9 +331,17 @@ public class LowLevelHeuristic extends Operator {
     }
 
     public double getMultiArmedBanditValue() {
-        double a = Math.log(SUM_N);
-        double b = Math.sqrt(2.0 * a);
-        aux = b / n;
+        /*  KE LI code
+        http://www.cs.cityu.edu.hk/~51888309/code/bandits.zip
+            
+                temp1 = 2 * Math.log(total_usage);
+                temp2 = temp1 / strategy_usage[i];
+                temp3 = Math.sqrt(temp2);
+                quality[i] = rewards[i] + scale_ * temp3;
+             */
+        double a = 2 * Math.log(SUM_N);
+        double b = a /n;
+        aux = Math.sqrt(b);
         return (double) q + c * aux;
     }
 }

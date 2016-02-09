@@ -12,11 +12,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StreamTokenizer;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jmetal.base.*;
+import jmetal.base.variable.Permutation;
 import jmetal.experiments.Experiment;
 import jmetal.qualityIndicator.QualityIndicator;
+import jmetal.util.JMException;
 
 public class CITO_CAITO extends Problem {
 
@@ -52,7 +55,7 @@ public class CITO_CAITO extends Problem {
     public void readProblem(String fileName) throws FileNotFoundException, IOException {
         Reader inputFile = new BufferedReader(
                 new InputStreamReader(
-                new FileInputStream(fileName)));
+                        new FileInputStream(fileName)));
         StreamTokenizer token = new StreamTokenizer(inputFile);
         int lineNumber;
 
@@ -235,7 +238,6 @@ public class CITO_CAITO extends Problem {
 //            this.showMethodParamTypeMatrix();
 //            this.showConstraintMatrix();
 //            System.out.println("Aspects: "+aspects_.toString() );
-
         } catch (Exception e) {
             System.err.println("CITOProblem.readProblem():" + e);
             System.exit(1);
@@ -402,7 +404,6 @@ public class CITO_CAITO extends Problem {
                         dominado = true;
                     }
                 }
-
 
                 if (dominador) {
 //                    System.out.println("--------------------------------------------");
@@ -578,7 +579,6 @@ public class CITO_CAITO extends Problem {
         ArrayList subVector = new ArrayList();
 
         //System.out.println("Tamanho Vetor: " + size_);
-
         for (int indexSolution = 0; indexSolution < size_; indexSolution++) {
             //pega o id da classe para buscar as restricoes
             int contraintClassId = vector_[indexSolution];
@@ -665,4 +665,51 @@ public class CITO_CAITO extends Problem {
         return vector_;
     }
     //  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --  --
+
+    /**
+     * Evaluates the overall constraint violation of a <code>Solution</code>
+     * object.
+     *
+     * @param solution The <code>Solution</code> to evaluate.
+     */
+    @Override
+    public void evaluateConstraints(Solution solution) throws JMException {
+        this.evaluateConstraintsReturningChangePercent(solution);
+    } // evaluateConstraints
+
+    public double evaluateConstraintsReturningChangePercent(Solution solution) throws JMException {
+        int offspringVector[] = ((Permutation) solution.getDecisionVariables()[0]).vector_;
+        double semelhanca=this.fixChild(offspringVector);
+        //avaliar de novo caso for alterado
+        if(semelhanca <  1.0){
+            /*
+                a solucao foi alterada, portanto deve ser avaliada novamente. 
+                Isto pode ser alterado alterando a ordem de evaluate e evaluateConstraints nos algoritmos
+                mas foi alterado aqui para simplificar. Em sistemas de poucas solucoes a nao execucao disso
+                pode gerar resultados com fitness 0.
+            */
+            this.evaluate(solution);
+        }
+        return semelhanca;
+    } // evaluateConstraints
+    
+    private double fixChild(int child[]) {
+        int[] cpy = new int[child.length];
+        System.arraycopy(child, 0, cpy, 0, child.length);
+        child = this.tratarRestricoes(child, this.getConstraintMatrix());
+        // System.out.println("Antes "+Arrays.toString(cpy));
+        // System.out.println("Depois "+Arrays.toString(child));
+        return percentSemelhanca(child, cpy);
+    }
+     
+    public double percentSemelhanca(int original[], int altered[]) {
+        int qtddiff=0;
+        for (int i = 0; i < original.length; i++) {
+            if(original[i]!=altered[i]){
+                qtddiff++;
+            }
+        }
+        int semelhanca=original.length-qtddiff;
+        return ((double)semelhanca)/((double)original.length);
+    }
 }

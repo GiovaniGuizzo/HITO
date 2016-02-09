@@ -109,13 +109,6 @@ public class SwapMutation extends Mutation {
         }
 
         this.doMutation(probability.doubleValue(), solution, problem);
-
-        //rever as restricoes---------------------------------------------------
-        int solutionVector[] = ((Permutation) solution.getDecisionVariables()[0]).vector_;
-        solutionVector = problem.tratarRestricoes(solutionVector, problem.getConstraintMatrix());
-
-//        System.out.println(solution.getDecisionVariables()[0].toString());
-
         return solution;
     } // execute
     //--------------------------------------------------------------------------

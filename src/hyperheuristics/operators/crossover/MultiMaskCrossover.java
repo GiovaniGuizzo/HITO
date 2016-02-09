@@ -110,15 +110,6 @@ public class MultiMaskCrossover extends Crossover {
         }
 
         Solution[] offspring = doCrossover(crossoverProbability.doubleValue(), parents[0], parents[1]);
-
-        //rever as restricoes---------------------------------------------------
-        int offspring1Vector[] = ((Permutation) offspring[0].getDecisionVariables()[0]).vector_;
-        offspring1Vector = problem.tratarRestricoes(offspring1Vector, problem.getConstraintMatrix());
-
-        //rever as restricoes---------------------------------------------------
-        int offspring2Vector[] = ((Permutation) offspring[1].getDecisionVariables()[0]).vector_;
-        offspring2Vector = problem.tratarRestricoes(offspring2Vector, problem.getConstraintMatrix());
-
         return offspring;
     } // execute
 

@@ -35,12 +35,6 @@ public class SimpleInsertionMutation extends Mutation {
         if (PseudoRandom.randDouble() < probability) {
             this.doMutation(solution);
         }
-
-        //rever as restricoes---------------------------------------------------
-        int solutionVector[] = ((Permutation) solution.getDecisionVariables()[0]).vector_;
-        solutionVector = problem.tratarRestricoes(solutionVector, problem.getConstraintMatrix());
-
-//        System.out.println(solution.getDecisionVariables()[0].toString());
         return solution;
     }
 
