@@ -1,17 +1,15 @@
 /**
  * Solution.java
- * 
+ *
  * @author Juan J. Durillo
  * @author Antonio J. Nebro
- * @version 1.0 
+ * @version 1.0
  */
 package jmetal.base;
 
 import java.io.Serializable;
-
 import jmetal.base.variable.Binary;
 import jmetal.problems.CITO_CAITO;
-import jmetal.util.Configuration.*;
 
 /**
  * Class representing a solution for a problem.
@@ -43,8 +41,7 @@ public class Solution implements Serializable {
      */
     private double fitness_;
     /**
-     * Used in algorithm AbYSS, this field is intended to be used to know
-     * when a <code>Solution</code> is marked.
+     * Used in algorithm AbYSS, this field is intended to be used to know when a <code>Solution</code> is marked.
      */
     private boolean marked_;
     /**
@@ -60,25 +57,30 @@ public class Solution implements Serializable {
      */
     private int numberOfViolatedConstraints_;
     /**
-     * This field is intended to be used to know the location of
-     * a solution into a <code>SolutionSet</code>. Used in MOCell
+     * This field is intended to be used to know the location of a solution into a <code>SolutionSet</code>. Used in MOCell
      */
     private int location_;
     /**
-     * Stores the distance to his k-nearest neighbor into a
-     * <code>SolutionSet</code>. Used in SPEA2.
+     * Stores the distance to his k-nearest neighbor into a <code>SolutionSet</code>. Used in SPEA2.
      */
     private double kDistance_;
     /**
-     * Stores the crowding distance of the the solution in a
-     * <code>SolutionSet</code>. Used in NSGA-II.
+     * Stores the crowding distance of the the solution in a <code>SolutionSet</code>. Used in NSGA-II.
      */
     private double crowdingDistance_;
     /**
-     * Stores the distance between this solution and a <code>SolutionSet</code>.
-     * Used in AbySS.
+     * Stores the distance between this solution and a <code>SolutionSet</code>. Used in AbySS.
      */
     private double distanceToSolutionSet_;
+
+    private double diversity_;
+
+    private double associateDist_;
+
+    /**
+     * This field is intended to be used to know the region of a solution <code>SolutionSet</code>. Used in MST
+     */
+    private int region_;
 
     /**
      * Constructor.
@@ -95,10 +97,10 @@ public class Solution implements Serializable {
 
     /**
      * Constructor
+     *
      * @param numberOfObjectives Number of objectives of the solution
      *
-     * This constructor is used mainly to read objective values from a file to
-     * variables of a SolutionSet to apply quality indicators
+     * This constructor is used mainly to read objective values from a file to variables of a SolutionSet to apply quality indicators
      */
     public Solution(int numberOfObjectives) {
         numberOfObjectives_ = numberOfObjectives;
@@ -107,6 +109,7 @@ public class Solution implements Serializable {
 
     /**
      * Constructor.
+     *
      * @param problem The problem to solve
      * @throws ClassNotFoundException
      */
@@ -132,6 +135,7 @@ public class Solution implements Serializable {
 
     /**
      * Constructor
+     *
      * @param problem The problem to solve
      */
     public Solution(Problem problem, Variable[] variables) {
@@ -152,6 +156,7 @@ public class Solution implements Serializable {
 
     /**
      * Copy constructor.
+     *
      * @param solution Solution to copy.
      */
     public Solution(Solution solution) {
@@ -178,8 +183,8 @@ public class Solution implements Serializable {
     } // Solution
 
     /**
-     * Sets the distance between this solution and a <code>SolutionSet</code>.
-     * The value is stored in <code>distanceToSolutionSet_</code>.
+     * Sets the distance between this solution and a <code>SolutionSet</code>. The value is stored in <code>distanceToSolutionSet_</code>.
+     *
      * @param distance The distance to a solutionSet.
      */
     public void setDistanceToSolutionSet(double distance) {
@@ -188,8 +193,8 @@ public class Solution implements Serializable {
 
     /**
      * Gets the distance from the solution to a <code>SolutionSet</code>.
-     * <b> REQUIRE </b>: this method has to be invoked after calling
-     * <code>setDistanceToPopulation</code>.
+     * <b> REQUIRE </b>: this method has to be invoked after calling <code>setDistanceToPopulation</code>.
+     *
      * @return the distance to a specific solutionSet.
      */
     public double getDistanceToSolutionSet() {
@@ -197,8 +202,8 @@ public class Solution implements Serializable {
     } // getDistanceToSolutionSet
 
     /**
-     * Sets the distance between the solution and its k-nearest neighbor in
-     * a <code>SolutionSet</code>. The value is stored in <code>kDistance_</code>.
+     * Sets the distance between the solution and its k-nearest neighbor in a <code>SolutionSet</code>. The value is stored in <code>kDistance_</code>.
+     *
      * @param distance The distance to the k-nearest neighbor.
      */
     public void setKDistance(double distance) {
@@ -206,10 +211,8 @@ public class Solution implements Serializable {
     } // setKDistance
 
     /**
-     * Gets the distance from the solution to his k-nearest nighbor in a
-     * <code>SolutionSet</code>. Returns the value stored in
-     * <code>kDistance_</code>. <b> REQUIRE </b>: this method has to be invoked
-     * after calling <code>setKDistance</code>.
+     * Gets the distance from the solution to his k-nearest nighbor in a <code>SolutionSet</code>. Returns the value stored in <code>kDistance_</code>. <b> REQUIRE </b>: this method has to be invoked after calling <code>setKDistance</code>.
+     *
      * @return the distance to k-nearest neighbor.
      */
     public double getKDistance() {
@@ -217,8 +220,8 @@ public class Solution implements Serializable {
     } // getKDistance
 
     /**
-     * Sets the crowding distance of a solution in a <code>SolutionSet</code>.
-     * The value is stored in <code>crowdingDistance_</code>.
+     * Sets the crowding distance of a solution in a <code>SolutionSet</code>. The value is stored in <code>crowdingDistance_</code>.
+     *
      * @param distance The crowding distance of the solution.
      */
     public void setCrowdingDistance(double distance) {
@@ -226,10 +229,9 @@ public class Solution implements Serializable {
     } // setCrowdingDistance
 
     /**
-     * Gets the crowding distance of the solution into a <code>SolutionSet</code>.
-     * Returns the value stored in <code>crowdingDistance_</code>.
-     * <b> REQUIRE </b>: this method has to be invoked after calling
-     * <code>setCrowdingDistance</code>.
+     * Gets the crowding distance of the solution into a <code>SolutionSet</code>. Returns the value stored in <code>crowdingDistance_</code>.
+     * <b> REQUIRE </b>: this method has to be invoked after calling <code>setCrowdingDistance</code>.
+     *
      * @return the distance crowding distance of the solution.
      */
     public double getCrowdingDistance() {
@@ -237,8 +239,8 @@ public class Solution implements Serializable {
     } // getCrowdingDistance
 
     /**
-     * Sets the fitness of a solution.
-     * The value is stored in <code>fitness_</code>.
+     * Sets the fitness of a solution. The value is stored in <code>fitness_</code>.
+     *
      * @param fitness The fitness of the solution.
      */
     public void setFitness(double fitness) {
@@ -246,10 +248,9 @@ public class Solution implements Serializable {
     } // setFitness
 
     /**
-     * Gets the fitness of the solution.
-     * Returns the value of stored in the variable <code>fitness_</code>.
-     * <b> REQUIRE </b>: This method has to be invoked after calling
-     * <code>setFitness()</code>.
+     * Gets the fitness of the solution. Returns the value of stored in the variable <code>fitness_</code>.
+     * <b> REQUIRE </b>: This method has to be invoked after calling <code>setFitness()</code>.
+     *
      * @return the fitness.
      */
     public double getFitness() {
@@ -258,6 +259,7 @@ public class Solution implements Serializable {
 
     /**
      * Sets the value of the i-th objective.
+     *
      * @param i The number identifying the objective.
      * @param value The value to be stored.
      */
@@ -267,6 +269,7 @@ public class Solution implements Serializable {
 
     /**
      * Returns the value of the i-th objective.
+     *
      * @param i The value of the objective.
      */
     public double getObjective(int i) {
@@ -275,6 +278,7 @@ public class Solution implements Serializable {
 
     /**
      * Returns the number of objectives.
+     *
      * @return The number of objectives.
      */
     public int numberOfObjectives() {
@@ -287,6 +291,7 @@ public class Solution implements Serializable {
 
     /**
      * Returns the number of decision variables of the solution.
+     *
      * @return The number of decision variables.
      */
     public int numberOfVariables() {
@@ -295,6 +300,7 @@ public class Solution implements Serializable {
 
     /**
      * Returns a string representing the solution.
+     *
      * @return The string.
      */
     public String toString() {
@@ -308,8 +314,8 @@ public class Solution implements Serializable {
 
     /**
      * Returns the decision variables of the solution.
-     * @return the <code>DecisionVariables</code> object representing the decision
-     * variables of the solution.
+     *
+     * @return the <code>DecisionVariables</code> object representing the decision variables of the solution.
      */
     public Variable[] getDecisionVariables() {
         return variable_;
@@ -317,8 +323,8 @@ public class Solution implements Serializable {
 
     /**
      * Sets the decision variables for the solution.
-     * @param decisionVariables The <code>DecisionVariables</code> object
-     * representing the decision variables of the solution.
+     *
+     * @param decisionVariables The <code>DecisionVariables</code> object representing the decision variables of the solution.
      */
     public void setDecisionVariables(Variable[] variables) {
         variable_ = variables;
@@ -326,9 +332,8 @@ public class Solution implements Serializable {
 
     /**
      * Indicates if the solution is marked.
-     * @return true if the method <code>marked</code> has been called and, after
-     * that, the method <code>unmarked</code> hasn't been called. False in other
-     * case.
+     *
+     * @return true if the method <code>marked</code> has been called and, after that, the method <code>unmarked</code> hasn't been called. False in other case.
      */
     public boolean isMarked() {
         return this.marked_;
@@ -350,6 +355,7 @@ public class Solution implements Serializable {
 
     /**
      * Sets the rank of a solution.
+     *
      * @param value The rank of the solution.
      */
     public void setRank(int value) {
@@ -358,8 +364,8 @@ public class Solution implements Serializable {
 
     /**
      * Gets the rank of the solution.
-     * <b> REQUIRE </b>: This method has to be invoked after calling
-     * <code>setRank()</code>.
+     * <b> REQUIRE </b>: This method has to be invoked after calling <code>setRank()</code>.
+     *
      * @return the rank of the solution.
      */
     public int getRank() {
@@ -368,6 +374,7 @@ public class Solution implements Serializable {
 
     /**
      * Sets the overall constraints violated by the solution.
+     *
      * @param value The overall constraints violated by the solution.
      */
     public void setOverallConstraintViolation(double value) {
@@ -376,8 +383,8 @@ public class Solution implements Serializable {
 
     /**
      * Gets the overall constraint violated by the solution.
-     * <b> REQUIRE </b>: This method has to be invoked after calling
-     * <code>overallConstraintViolation</code>.
+     * <b> REQUIRE </b>: This method has to be invoked after calling <code>overallConstraintViolation</code>.
+     *
      * @return the overall constraint violation by the solution.
      */
     public double getOverallConstraintViolation() {
@@ -386,6 +393,7 @@ public class Solution implements Serializable {
 
     /**
      * Sets the number of constraints violated by the solution.
+     *
      * @param value The number of constraints violated by the solution.
      */
     public void setNumberOfViolatedConstraint(int value) {
@@ -394,8 +402,8 @@ public class Solution implements Serializable {
 
     /**
      * Gets the number of constraint violated by the solution.
-     * <b> REQUIRE </b>: This method has to be invoked after calling
-     * <code>setNumberOfViolatedConstraint</code>.
+     * <b> REQUIRE </b>: This method has to be invoked after calling <code>setNumberOfViolatedConstraint</code>.
+     *
      * @return the number of constraints violated by the solution.
      */
     public int getNumberOfViolatedConstraint() {
@@ -404,6 +412,7 @@ public class Solution implements Serializable {
 
     /**
      * Sets the location of the solution into a solutionSet.
+     *
      * @param location The location of the solution.
      */
     public void setLocation(int location) {
@@ -412,8 +421,8 @@ public class Solution implements Serializable {
 
     /**
      * Gets the location of this solution in a <code>SolutionSet</code>.
-     * <b> REQUIRE </b>: This method has to be invoked after calling
-     * <code>setLocation</code>.
+     * <b> REQUIRE </b>: This method has to be invoked after calling <code>setLocation</code>.
+     *
      * @return the location of the solution into a solutionSet
      */
     public int getLocation() {
@@ -422,6 +431,7 @@ public class Solution implements Serializable {
 
     /**
      * Sets the type of the variable.
+     *
      * @param type The type of the variable.
      */
     //public void setType(String type) {
@@ -429,6 +439,7 @@ public class Solution implements Serializable {
     //} // setType
     /**
      * Sets the type of the variable.
+     *
      * @param type The type of the variable.
      */
     public void setType(SolutionType type) {
@@ -437,6 +448,7 @@ public class Solution implements Serializable {
 
     /**
      * Gets the type of the variable
+     *
      * @return the type of the variable
      */
     public SolutionType getType() {
@@ -445,6 +457,7 @@ public class Solution implements Serializable {
 
     /**
      * Returns the aggregative value of the solution
+     *
      * @return The aggregative value.
      */
     public double getAggregativeValue() {
@@ -456,8 +469,8 @@ public class Solution implements Serializable {
     } // getAggregativeValue
 
     /**
-     * Returns the number of bits of the chromosome in case of using a binary
-     * representation
+     * Returns the number of bits of the chromosome in case of using a binary representation
+     *
      * @return The number of bits if the case of binary variables, 0 otherwise
      */
     public int getNumberOfBits() {
@@ -477,5 +490,37 @@ public class Solution implements Serializable {
 
         return bits;
     } // getNumberOfBits
+
+    public void Set_location(int i) {
+        this.location_ = i;
+    }
+
+    public int read_location() {
+        return this.location_;
+    }
+
+    public void Set_diversity(double i) {
+        this.diversity_ = i;
+    }
+
+    public double read_diversity() {
+        return this.diversity_;
+    }
+
+    public void setRegion(int i) {
+        this.region_ = i;
+    }
+
+    public int readRegion() {
+        return this.region_;
+    }
+
+    public void Set_associateDist(double distance) {
+        this.associateDist_ = distance;
+    }
+
+    public double read_associateDist() {
+        return this.associateDist_;
+    }
 } // Solution
 
