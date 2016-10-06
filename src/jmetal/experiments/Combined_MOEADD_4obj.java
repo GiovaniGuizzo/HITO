@@ -10,7 +10,7 @@ import jmetal.base.operator.crossover.CrossoverFactory;
 import jmetal.base.operator.mutation.MutationFactory;
 import jmetal.base.operator.selection.SelectionFactory;
 import jmetal.metaheuristics.moead.MOEADD;
-import jmetal.problems.Combined2Objetives;
+import jmetal.problems.Combined4Objectives;
 import jmetal.util.JMException;
 
 public class Combined_MOEADD_4obj {
@@ -46,7 +46,7 @@ public class Combined_MOEADD_4obj {
                 }
             }
 
-            Combined2Objetives problem = new Combined2Objetives("problemas/" + filename + ".txt");
+            Combined4Objectives problem = new Combined4Objectives("problemas/" + filename + ".txt");
             Algorithm algorithm = new MOEADD(problem);
             SolutionSet todasRuns = new SolutionSet();
             Operator crossover;
