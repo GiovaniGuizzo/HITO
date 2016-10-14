@@ -36,7 +36,7 @@ public class Combined_MOEADD_2obj {
             int populationSize = 300;
             int maxEvaluations = 60000;
             double crossoverProbability = 1.0;
-            double mutationProbability = (double) 1 / (double) populationSize; //0.2;
+            double mutationProbability = 0.2;
             String context = "_Comb_2obj";
 
             File directory = new File("resultado/moeadd/" + filename + context);

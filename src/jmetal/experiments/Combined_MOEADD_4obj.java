@@ -34,9 +34,9 @@ public class Combined_MOEADD_4obj {
 
             int runsNumber = 30;
             int populationSize = 364;
-            int maxEvaluations = 60060;
+            int maxEvaluations = 72800;
             double crossoverProbability = 1.0;
-            double mutationProbability = (double) 1 / (double) populationSize; //0.2;
+            double mutationProbability = 0.2;
             String context = "_Comb_4obj";
 
             File directory = new File("resultado/moeadd/" + filename + context);
