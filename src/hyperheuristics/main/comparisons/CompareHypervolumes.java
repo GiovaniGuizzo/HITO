@@ -52,13 +52,13 @@ public class CompareHypervolumes {
 
         String[] heuristicFunctions = new String[]{
             LowLevelHeuristic.CHOICE_FUNCTION,
-            LowLevelHeuristic.MULTI_ARMED_BANDIT, //            LowLevelHeuristic.RANDOM
+            LowLevelHeuristic.MULTI_ARMED_BANDIT,
+            LowLevelHeuristic.RANDOM
         };
 
         String[] algorithms = new String[]{
-            "NSGA-II",
-            "SPEA2"
-        };
+            "NSGAII",
+            "MOEADD",};
 
         for (int numberOfObjectives : numberOfObjectivesArray) {
 //            hypervolumeComparison(problems, heuristicFunctions, numberOfObjectives, algorithms);
@@ -77,157 +77,168 @@ public class CompareHypervolumes {
             DecimalFormat decimalFormatter = new DecimalFormat("0.00E0");
             StandardDeviation standardDeviation = new StandardDeviation();
 
-            pfKnown:
-            {
-                tableString.append("\\documentclass{paper}\n"
-                        + "\n"
-                        + "\\usepackage[T1]{fontenc}\n"
-                        + "\\usepackage[latin1]{inputenc}\n"
-                        + "\\usepackage[hidelinks]{hyperref}\n"
-                        + "\\usepackage{tabulary}\n"
-                        + "\\usepackage{booktabs}\n"
-                        + "\\usepackage{multirow}\n"
-                        + "\\usepackage{amsmath}\n"
-                        + "\\usepackage{mathtools}\n"
-                        + "\\usepackage{graphicx}\n"
-                        + "\\usepackage{array}\n"
-                        + "\\usepackage[linesnumbered,ruled,inoutnumbered]{algorithm2e}\n"
-                        + "\\usepackage{subfigure}\n"
-                        + "\\usepackage[hypcap]{caption}\n"
-                        + "\\usepackage{pdflscape}\n"
-                        + "\n"
-                        + "\\begin{document}\n"
-                        + "\n"
-                        + "\\begin{landscape}\n"
-                        + "\n");
-
-                tableString
-                        .append("\\begin{table}[!htb]\n"
-                                + "\t\\centering\n"
-                                + "\t\\def\\arraystretch{1.5}\n"
-                                + "\t\\setlength{\\tabcolsep}{10pt}\n"
-                                + "\t\\fontsize{8pt}{10pt}\\selectfont"
-                                + "\t\\caption{Hypervolume of the $PF_{known}$ fronts for ").append(numberOfObjectives).append(" objectives}\n"
-                                + "\t\\label{tab:Hypervolumes ").append(numberOfObjectives).append(" objectives}\n"
-                                + "\t\\begin{tabulary}{\\textwidth}{c");
-                for (String algorithm : algorithms) {
-                    tableString.append("c");
-                    for (String heuristicFunction : heuristicFunctions) {
-                        tableString.append("c");
-                    }
-                }
-                tableString.append("}\n");
-                tableString.append("\t\t\\toprule\n");
-                tableString.append("\t\t\\textbf{System}");
-
-                for (String algorithm : algorithms) {
-                    tableString.append(" & \\textbf{").append(algorithm).append("}");
-                    for (String heuristicFunction : heuristicFunctions) {
-                        tableString.append(" & \\textbf{").append(algorithm).append("-").append(heuristicFunction).append("}");
-                    }
-                }
-                tableString.append("\\\\\n");
-                tableString.append("\t\t\\midrule\n");
-
-                for (String problem : problems) {
-                    HypervolumeHandler hypervolumeHandler = new HypervolumeHandler();
-
-                    for (String algorithm : algorithms) {
-                        String mecbaDirectory = "resultado/" + algorithm.toLowerCase().replaceAll("-", "") + "/" + problem + "_Comb_" + numberOfObjectives + "obj/";
-
-                        //Best PFknown hypervolume
-                        //Populate HypervolueHandler
-                        hypervolumeHandler.addParetoFront(mecbaDirectory + "All_FUN_" + algorithm.toLowerCase().replaceAll("-", "") + "-" + problem);
-
-                        for (String heuristicFunction : heuristicFunctions) {
-                            String path = outpath;
-                            path += algorithm + "/" + numberOfObjectives + "objectives/";
-                            String hyperheuristicDirectory = path + heuristicFunction + "/" + problem + "/";
-                            hypervolumeHandler.addParetoFront(hyperheuristicDirectory + "FUN.txt");
-                        }
-                    }
-
-                    double[] mecbaHypervolumes = new double[algorithms.length];
-                    double[] hyperheuristicHypervolumes = new double[heuristicFunctions.length * algorithms.length];
-
-                    Arrays.fill(hyperheuristicHypervolumes, 0D);
-                    for (int i = 0; i < algorithms.length; i++) {
-                        String algorithm = algorithms[i];
-                        String mecbaDirectory = "resultado/" + algorithm.toLowerCase().replaceAll("-", "") + "/" + problem + "_Comb_" + numberOfObjectives + "obj/";
-                        //Calculate Hypervolume
-                        mecbaHypervolumes[i] = hypervolumeHandler.calculateHypervolume(mecbaDirectory + "All_FUN_" + algorithm.toLowerCase().replaceAll("-", "") + "-" + problem, numberOfObjectives);
-
-                        for (int j = 0; j < heuristicFunctions.length; j++) {
-                            String heuristicFunction = heuristicFunctions[j];
-                            String path = outpath;
-                            path += algorithm + "/" + numberOfObjectives + "objectives/";
-                            String hyperheuristicDirectory = path + heuristicFunction + "/" + problem + "/";
-                            hyperheuristicHypervolumes[i * heuristicFunctions.length + j] = hypervolumeHandler.calculateHypervolume(hyperheuristicDirectory + "FUN.txt", numberOfObjectives);
-                        }
-                    }
-                    //Write PFknown results
-                    double maxHypervolume = Double.NEGATIVE_INFINITY;
-
-                    for (int i = 0; i < mecbaHypervolumes.length; i++) {
-                        double hypervolume = mecbaHypervolumes[i];
-                        if (hypervolume > maxHypervolume) {
-                            maxHypervolume = hypervolume;
-                        }
-                    }
-
-                    for (int i = 0; i < heuristicFunctions.length; i++) {
-                        if (hyperheuristicHypervolumes[i] > maxHypervolume) {
-                            maxHypervolume = hyperheuristicHypervolumes[i];
-                        }
-                    }
-
-                    tableString.append("\t\t" + problem.replaceAll("\\_", "\\\\_"));
-                    for (int i = 0; i < algorithms.length; i++) {
-                        tableString.append(" & ");
-                        double mecbaHypervolume = mecbaHypervolumes[i];
-                        if (maxHypervolume == mecbaHypervolume) {
-                            tableString.append("\\textbf{");
-                        }
-                        tableString.append(decimalFormatter.format(mecbaHypervolume));
-                        if (maxHypervolume == mecbaHypervolume) {
-                            tableString.append("}");
-                        }
-
-                        for (int j = 0; j < heuristicFunctions.length; j++) {
-                            tableString.append(" & ");
-                            double hyperheuristicHypervolume = hyperheuristicHypervolumes[i * heuristicFunctions.length + j];
-                            if (maxHypervolume == hyperheuristicHypervolume) {
-                                tableString.append("\\textbf{");
-                            }
-                            tableString.append(decimalFormatter.format(hyperheuristicHypervolume));
-                            if (maxHypervolume == hyperheuristicHypervolume) {
-                                tableString.append("}");
-                            }
-                        }
-                    }
-
-                    tableString.append("\\\\\n");
-                }
-                tableString.append("\t\t\\bottomrule\n");
-                tableString.append("\t\\end{tabulary}\n");
-                tableString.append("\\end{table}\n\n");
-            }
-
+//            pfKnown:
+//            {
+//                tableString.append("\\documentclass{paper}\n"
+//                        + "\n"
+//                        + "\\usepackage[T1]{fontenc}\n"
+//                        + "\\usepackage[latin1]{inputenc}\n"
+//                        + "\\usepackage[hidelinks]{hyperref}\n"
+//                        + "\\usepackage{tabulary}\n"
+//                        + "\\usepackage{booktabs}\n"
+//                        + "\\usepackage{multirow}\n"
+//                        + "\\usepackage{amsmath}\n"
+//                        + "\\usepackage{mathtools}\n"
+//                        + "\\usepackage{graphicx}\n"
+//                        + "\\usepackage{array}\n"
+//                        + "\\usepackage[linesnumbered,ruled,inoutnumbered]{algorithm2e}\n"
+//                        + "\\usepackage{subfigure}\n"
+//                        + "\\usepackage[hypcap]{caption}\n"
+//                        + "\\usepackage{pdflscape}\n"
+//                        + "\n"
+//                        + "\\begin{document}\n"
+//                        + "\n"
+//                        + "\\begin{landscape}\n"
+//                        + "\n");
+//
+//                tableString
+//                        .append("\\begin{table}[!htb]\n"
+//                                + "\t\\centering\n"
+//                                + "\t\\def\\arraystretch{1.5}\n"
+//                                + "\t\\setlength{\\tabcolsep}{10pt}\n"
+//                                + "\t\\fontsize{8pt}{10pt}\\selectfont"
+//                                + "\t\\caption{Hypervolume of the $PF_{known}$ fronts for ").append(numberOfObjectives).append(" objectives}\n"
+//                        + "\t\\label{tab:Hypervolumes ").append(numberOfObjectives).append(" objectives}\n"
+//                        + "\t\\begin{tabulary}{\\textwidth}{c");
+//                for (String algorithm : algorithms) {
+//                    tableString.append("c");
+//                    if (!"MOEADD".equals(algorithm)) {
+//                        for (String heuristicFunction : heuristicFunctions) {
+//                            tableString.append("c");
+//                        }
+//                    }
+//                }
+//                tableString.append("}\n");
+//                tableString.append("\t\t\\toprule\n");
+//                tableString.append("\t\t\\textbf{System}");
+//
+//                for (String algorithm : algorithms) {
+//                    tableString.append(" & \\textbf{").append(algorithm).append("}");
+//                    if (!"MOEADD".equals(algorithm)) {
+//                        for (String heuristicFunction : heuristicFunctions) {
+//                            tableString.append(" & \\textbf{").append(algorithm).append("-").append(heuristicFunction).append("}");
+//                        }
+//                    }
+//                }
+//                tableString.append("\\\\\n");
+//                tableString.append("\t\t\\midrule\n");
+//
+//                for (String problem : problems) {
+//                    HypervolumeHandler hypervolumeHandler = new HypervolumeHandler();
+//
+//                    for (String algorithm : algorithms) {
+//                        String mecbaDirectory = "resultado/" + algorithm.toLowerCase().replaceAll("-", "") + "/" + problem + "_Comb_" + numberOfObjectives + "obj/";
+//
+//                        //Best PFknown hypervolume
+//                        //Populate HypervolueHandler
+//                        hypervolumeHandler.addParetoFront(mecbaDirectory + "All_FUN_" + algorithm.toLowerCase().replaceAll("-", "") + "-" + problem);
+//
+//                        if (!"MOEADD".equals(algorithm)) {
+//                            for (String heuristicFunction : heuristicFunctions) {
+//                                String path = outpath;
+//                                path += algorithm + "/" + numberOfObjectives + "objectives/";
+//                                String hyperheuristicDirectory = path + heuristicFunction + "/" + problem + "/";
+//                                hypervolumeHandler.addParetoFront(hyperheuristicDirectory + "FUN.txt");
+//                            }
+//                        }
+//                    }
+//
+//                    double[] mecbaHypervolumes = new double[algorithms.length];
+//                    double[] hyperheuristicHypervolumes = new double[heuristicFunctions.length * algorithms.length];
+//
+//                    Arrays.fill(hyperheuristicHypervolumes, 0D);
+//                    for (int i = 0; i < algorithms.length; i++) {
+//                        String algorithm = algorithms[i];
+//                        String mecbaDirectory = "resultado/" + algorithm.toLowerCase().replaceAll("-", "") + "/" + problem + "_Comb_" + numberOfObjectives + "obj/";
+//                        //Calculate Hypervolume
+//                        mecbaHypervolumes[i] = hypervolumeHandler.calculateHypervolume(mecbaDirectory + "All_FUN_" + algorithm.toLowerCase().replaceAll("-", "") + "-" + problem, numberOfObjectives);
+//
+//                        if (!"MOEADD".equals(algorithm)) {
+//                            for (int j = 0; j < heuristicFunctions.length; j++) {
+//                                String heuristicFunction = heuristicFunctions[j];
+//                                String path = outpath;
+//                                path += algorithm + "/" + numberOfObjectives + "objectives/";
+//                                String hyperheuristicDirectory = path + heuristicFunction + "/" + problem + "/";
+//                                hyperheuristicHypervolumes[i * heuristicFunctions.length + j] = hypervolumeHandler.calculateHypervolume(hyperheuristicDirectory + "FUN.txt", numberOfObjectives);
+//                            }
+//                        }
+//                    }
+//                    //Write PFknown results
+//                    double maxHypervolume = Double.NEGATIVE_INFINITY;
+//
+//                    for (int i = 0; i < mecbaHypervolumes.length; i++) {
+//                        double hypervolume = mecbaHypervolumes[i];
+//                        if (hypervolume > maxHypervolume) {
+//                            maxHypervolume = hypervolume;
+//                        }
+//                    }
+//
+//                    for (int i = 0; i < heuristicFunctions.length; i++) {
+//                        if (hyperheuristicHypervolumes[i] > maxHypervolume) {
+//                            maxHypervolume = hyperheuristicHypervolumes[i];
+//                        }
+//                    }
+//
+//                    tableString.append("\t\t" + problem.replaceAll("\\_", "\\\\_"));
+//                    for (int i = 0; i < algorithms.length; i++) {
+//                        tableString.append(" & ");
+//                        double mecbaHypervolume = mecbaHypervolumes[i];
+//                        if (maxHypervolume == mecbaHypervolume) {
+//                            tableString.append("\\textbf{");
+//                        }
+//                        tableString.append(decimalFormatter.format(mecbaHypervolume));
+//                        if (maxHypervolume == mecbaHypervolume) {
+//                            tableString.append("}");
+//                        }
+//
+//                        if (!"MOEADD".equals(algorithms[i])) {
+//                            for (int j = 0; j < heuristicFunctions.length; j++) {
+//                                tableString.append(" & ");
+//                                double hyperheuristicHypervolume = hyperheuristicHypervolumes[i * heuristicFunctions.length + j];
+//                                if (maxHypervolume == hyperheuristicHypervolume) {
+//                                    tableString.append("\\textbf{");
+//                                }
+//                                tableString.append(decimalFormatter.format(hyperheuristicHypervolume));
+//                                if (maxHypervolume == hyperheuristicHypervolume) {
+//                                    tableString.append("}");
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    tableString.append("\\\\\n");
+//                }
+//                tableString.append("\t\t\\bottomrule\n");
+//                tableString.append("\t\\end{tabulary}\n");
+//                tableString.append("\\end{table}\n\n");
+//            }
             //Best mean hypervolume
             mean:
             {
                 tableString.append("\\begin{table}[!htb]\n"
                         + "\\centering\n"
-                        + "\t\\def\\arraystretch{1.5}\n"
-                        + "\t\\setlength{\\tabcolsep}{10pt}\n"
-                        + "\t\\fontsize{8pt}{10pt}\\selectfont"
+                        //                        + "\t\\def\\arraystretch{1.5}\n"
+                        //                        + "\t\\setlength{\\tabcolsep}{10pt}\n"
+                        + "\t\\fontsize{8pt}{8pt}\\selectfont\n"
                         + "\t\\caption{Hypervolume average found for " + numberOfObjectives + " objectives}\n"
                         + "\t\\label{tab:Hypervolumes average " + numberOfObjectives + " objectives}\n"
                         + "\t\\begin{tabulary}{\\textwidth}{c");
                 for (String algorithm : algorithms) {
                     tableString.append("c");
-                    for (String heuristicFunction : heuristicFunctions) {
-                        tableString.append("c");
+                    if (!"MOEADD".equals(algorithm)) {
+                        for (String heuristicFunction : heuristicFunctions) {
+                            tableString.append("c");
+                        }
                     }
                 }
                 tableString.append("}\n");
@@ -236,8 +247,10 @@ public class CompareHypervolumes {
 
                 for (String algorithm : algorithms) {
                     tableString.append(" & \\textbf{" + algorithm + "}");
-                    for (String heuristicFunction : heuristicFunctions) {
-                        tableString.append(" & \\textbf{" + algorithm + "-" + heuristicFunction + "}");
+                    if (!"MOEADD".equals(algorithm)) {
+                        for (String heuristicFunction : heuristicFunctions) {
+                            tableString.append(" & \\textbf{" + algorithm + "-" + heuristicFunction + "}");
+                        }
                     }
                 }
                 tableString.append("\\\\\n");
@@ -253,12 +266,14 @@ public class CompareHypervolumes {
                             hypervolumeHandler.addParetoFront(mecbaDirectory + "FUN_" + algorithm.toLowerCase().replaceAll("-", "") + "-" + problem + "-" + i + ".NaoDominadas");
                         }
 
-                        for (String heuristicFunction : heuristicFunctions) {
-                            String path = outpath;
-                            path += algorithm + "/" + numberOfObjectives + "objectives/";
-                            String hyperheuristicDirectory = path + heuristicFunction + "/" + problem + "/";
-                            for (int j = 0; j < EXECUTIONS; j++) {
-                                hypervolumeHandler.addParetoFront(hyperheuristicDirectory + "EXECUTION_" + j + "/FUN.txt");
+                        if (!"MOEADD".equals(algorithm)) {
+                            for (String heuristicFunction : heuristicFunctions) {
+                                String path = outpath;
+                                path += algorithm + "/" + numberOfObjectives + "objectives/";
+                                String hyperheuristicDirectory = path + heuristicFunction + "/" + problem + "/";
+                                for (int j = 0; j < EXECUTIONS; j++) {
+                                    hypervolumeHandler.addParetoFront(hyperheuristicDirectory + "EXECUTION_" + j + "/FUN.txt");
+                                }
                             }
                         }
                     }
@@ -271,12 +286,12 @@ public class CompareHypervolumes {
                     double mecbaMeanHypervolume[] = new double[algorithms.length];
                     Arrays.fill(mecbaMeanHypervolume, 0D);
 
-                    double[][] hyperheuristicHypervolumes = new double[algorithms.length * heuristicFunctions.length][EXECUTIONS];
+                    double[][] hyperheuristicHypervolumes = new double[(algorithms.length - 1) * heuristicFunctions.length][EXECUTIONS];
                     for (double[] hyperheuristicHypervolume : hyperheuristicHypervolumes) {
                         Arrays.fill(hyperheuristicHypervolume, 0D);
                     }
 
-                    double[] hyperheuristicMeanHypervolumes = new double[algorithms.length * heuristicFunctions.length];
+                    double[] hyperheuristicMeanHypervolumes = new double[(algorithms.length - 1) * heuristicFunctions.length];
                     Arrays.fill(hyperheuristicMeanHypervolumes, 0D);
 
                     for (int i = 0; i < algorithms.length; i++) {
@@ -285,12 +300,14 @@ public class CompareHypervolumes {
                         for (int j = 0; j < EXECUTIONS; j++) {
                             mecbaHypervolumes[i][j] = hypervolumeHandler.calculateHypervolume(mecbaDirectory + "FUN_" + algorithm.toLowerCase().replaceAll("-", "") + "-" + problem + "-" + j + ".NaoDominadas", numberOfObjectives);
                             mecbaMeanHypervolume[i] += mecbaHypervolumes[i][j];
-                            for (int k = 0; k < heuristicFunctions.length; k++) {
-                                String path = outpath;
-                                path += algorithm + "/" + numberOfObjectives + "objectives/";
-                                String hyperheuristicDirectory = path + heuristicFunctions[k] + "/" + problem + "/";
-                                hyperheuristicHypervolumes[i * heuristicFunctions.length + k][j] = hypervolumeHandler.calculateHypervolume(hyperheuristicDirectory + "EXECUTION_" + j + "/FUN.txt", numberOfObjectives);
-                                hyperheuristicMeanHypervolumes[i * heuristicFunctions.length + k] += hyperheuristicHypervolumes[i * heuristicFunctions.length + k][j];
+                            if (!"MOEADD".equals(algorithm)) {
+                                for (int k = 0; k < heuristicFunctions.length; k++) {
+                                    String path = outpath;
+                                    path += algorithm + "/" + numberOfObjectives + "objectives/";
+                                    String hyperheuristicDirectory = path + heuristicFunctions[k] + "/" + problem + "/";
+                                    hyperheuristicHypervolumes[i * heuristicFunctions.length + k][j] = hypervolumeHandler.calculateHypervolume(hyperheuristicDirectory + "EXECUTION_" + j + "/FUN.txt", numberOfObjectives);
+                                    hyperheuristicMeanHypervolumes[i * heuristicFunctions.length + k] += hyperheuristicHypervolumes[i * heuristicFunctions.length + k][j];
+                                }
                             }
                         }
                     }
@@ -317,7 +334,7 @@ public class CompareHypervolumes {
                         double hyperheuristicMeanHypervolume = hyperheuristicMeanHypervolumes[i];
                         if (hyperheuristicMeanHypervolume > maxMean) {
                             maxMean = hyperheuristicMeanHypervolume;
-                            maxHeuristic = algorithms[i / heuristicFunctions.length] + "-" + heuristicFunctions[i % heuristicFunctions.length];
+                            maxHeuristic = algorithms[i / heuristicFunctions.length] + heuristicFunctions[i % heuristicFunctions.length];
                         }
                     }
 
@@ -331,7 +348,7 @@ public class CompareHypervolumes {
                         double[] hyperheuristicHypervolume = hyperheuristicHypervolumes[i];
                         String heuristicFunction = heuristicFunctions[i % heuristicFunctions.length];
                         String algorithm = algorithms[i / heuristicFunctions.length];
-                        values.put(algorithm + "-" + heuristicFunction, hyperheuristicHypervolume);
+                        values.put(algorithm + heuristicFunction, hyperheuristicHypervolume);
                     }
 
                     HashMap<String, HashMap<String, Boolean>> result = KruskalWallisTest.test(values);
@@ -348,16 +365,18 @@ public class CompareHypervolumes {
                         if (algorithm.equals(maxHeuristic) || !result.get(algorithm).get(maxHeuristic)) {
                             tableString.append("}");
                         }
-                        for (int j = 0; j < heuristicFunctions.length; j++) {
-                            String heuristicFunction = algorithm + "-" + heuristicFunctions[j];
-                            tableString.append(" & ");
-                            if (heuristicFunction.equals(maxHeuristic) || !result.get(heuristicFunction).get(maxHeuristic)) {
-                                tableString.append("\\textbf{");
-                            }
-                            tableString.append(decimalFormatter.format(hyperheuristicMeanHypervolumes[i * heuristicFunctions.length + j]));
-                            tableString.append(" (").append(decimalFormatter.format(standardDeviation.evaluate(hyperheuristicHypervolumes[i * heuristicFunctions.length + j]))).append(")");
-                            if (heuristicFunction.equals(maxHeuristic) || !result.get(heuristicFunction).get(maxHeuristic)) {
-                                tableString.append("}");
+                        if (!"MOEADD".equals(algorithm)) {
+                            for (int j = 0; j < heuristicFunctions.length; j++) {
+                                String heuristicFunction = algorithm + heuristicFunctions[j];
+                                tableString.append(" & ");
+                                if (heuristicFunction.equals(maxHeuristic) || !result.get(heuristicFunction).get(maxHeuristic)) {
+                                    tableString.append("\\textbf{");
+                                }
+                                tableString.append(decimalFormatter.format(hyperheuristicMeanHypervolumes[i * heuristicFunctions.length + j]));
+                                tableString.append(" (").append(decimalFormatter.format(standardDeviation.evaluate(hyperheuristicHypervolumes[i * heuristicFunctions.length + j]))).append(")");
+                                if (heuristicFunction.equals(maxHeuristic) || !result.get(heuristicFunction).get(maxHeuristic)) {
+                                    tableString.append("}");
+                                }
                             }
                         }
                     }
@@ -410,14 +429,12 @@ public class CompareHypervolumes {
                     if (mecbaHypervolume == hyperheuristicHypervolume) {
                         fileWriter.append("Best PFknown: Tied!\n");
                         tied++;
+                    } else if (mecbaHypervolume > hyperheuristicHypervolume) {
+                        fileWriter.append("Best PFknown: MECBA\n");
+                        mecbaBest++;
                     } else {
-                        if (mecbaHypervolume > hyperheuristicHypervolume) {
-                            fileWriter.append("Best PFknown: MECBA\n");
-                            mecbaBest++;
-                        } else {
-                            fileWriter.append("Best PFknown: " + heuristicFunction + "\n");
-                            hyperheuristicBest++;
-                        }
+                        fileWriter.append("Best PFknown: " + heuristicFunction + "\n");
+                        hyperheuristicBest++;
                     }
 
                     //Best mean hypervolume

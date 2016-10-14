@@ -40,7 +40,7 @@ public class EffectSize {
             String groupA = groupArray[i];
             for (int j = i + 1; j < groupArray.length; j++) {
                 String groupB = groupArray[j];
-                script.append("cohen.d(").append(groupA).append(",").append(groupB).append(")\n");
+                script.append("VD.A(").append(groupA).append(",").append(groupB).append(")\n");
             }
         }
         script.append("q()");
@@ -53,7 +53,7 @@ public class EffectSize {
         new FileWriter(inputFile).append(script).flush();
 
         ProcessBuilder builder = new ProcessBuilder();
-        builder.command("R", "--slave", "-f", inputFile.getAbsolutePath());
+        builder.command(System.getProperty("os.name").contains("win") ? "R.exe" : "R", "--slave", "-f", inputFile.getAbsolutePath());
         builder.redirectOutput(outputFile);
         builder.start().waitFor();
 
@@ -62,7 +62,7 @@ public class EffectSize {
         List<Double> comparisonValues = new ArrayList<>();
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            if (line.contains("d estimate:")) {
+            if (line.contains("A estimate:")) {
                 String[] split = line.split(" ");
 
                 Double doubleValue = Double.parseDouble(split[2]);
@@ -91,7 +91,7 @@ public class EffectSize {
                 }
                 Double value = iterator.next();
                 groupAMap.put(groupB, value);
-                groupBMap.put(groupA, value * -1);
+                groupBMap.put(groupA, 1 - value);
             }
         }
 
@@ -102,12 +102,12 @@ public class EffectSize {
     }
 
     public static String interpretEffectSize(double effectSize) {
-        effectSize = StrictMath.abs(effectSize);
-        if (effectSize < 0.2) {
+        effectSize = StrictMath.abs(effectSize - 0.5) * 2;
+        if (effectSize < 0.147) {
             return NEGLIGIBLE;
-        } else if (effectSize < 0.5) {
+        } else if (effectSize < 0.33) {
             return SMALL;
-        } else if (effectSize < 0.8) {
+        } else if (effectSize < 0.474) {
             return MEDIUM;
         } else {
             return LARGE;
