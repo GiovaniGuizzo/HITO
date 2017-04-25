@@ -24,20 +24,11 @@ import hyperheuristics.comparators.LowLevelHeuristicComparatorFactory;
 import hyperheuristics.lowlevelheuristic.LowLevelHeuristic;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jmetal.base.Algorithm;
-import jmetal.base.Operator;
-import jmetal.base.Solution;
-import jmetal.base.SolutionSet;
+import jmetal.base.*;
 import jmetal.base.operator.comparator.CrowdingComparator;
-import jmetal.problems.CITO_CAITO;
 import jmetal.qualityIndicator.QualityIndicator;
 import jmetal.util.Distance;
 import jmetal.util.JMException;
@@ -50,7 +41,7 @@ import jmetal.util.Ranking;
 public class NSGAIIHyperheuristic extends Algorithm {
 
     private final List<LowLevelHeuristic> lowLevelHeuristics;
-    private final CITO_CAITO problem_;
+    private final Problem problem_;
     private FileWriter lowLevelHeuristicsRankWriter;
     private FileWriter lowLevelHeuristicsTimeWriter;
     private FileWriter qDebugWriter;
@@ -64,7 +55,7 @@ public class NSGAIIHyperheuristic extends Algorithm {
      *
      * @param problem Problem to solve
      */
-    public NSGAIIHyperheuristic(CITO_CAITO problem) {
+    public NSGAIIHyperheuristic(Problem problem) {
         this.lowLevelHeuristics = new ArrayList<>();
         this.problem_ = problem;
     } // NSGAII
@@ -238,6 +229,7 @@ public class NSGAIIHyperheuristic extends Algorithm {
         Solution newSolution;
         for (int i = 0; i < populationSize; i++) {
             newSolution = new Solution(problem_);
+            System.out.println("Evaluations: " + evaluations);
             problem_.evaluate(newSolution);
             problem_.evaluateConstraints(newSolution);
             evaluations++;
@@ -277,6 +269,7 @@ public class NSGAIIHyperheuristic extends Algorithm {
 
                 i++;
                 evaluations += 2;
+                System.out.println("Evaluations: " + evaluations);
 
                 if (qDebugWriter != null) {
                     try {

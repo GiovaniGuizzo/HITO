@@ -7,9 +7,9 @@
 package jmetal.base.operator.crossover;
 
 import java.util.Properties;
-import jmetal.base.*;
-import jmetal.base.variable.*;
-import jmetal.problems.CITO_CAITO;
+import jmetal.base.Problem;
+import jmetal.base.Solution;
+import jmetal.base.variable.Permutation;
 import jmetal.util.Configuration;
 import jmetal.util.JMException;
 import jmetal.util.PseudoRandom;
@@ -165,7 +165,7 @@ public class TwoPointsCrossover extends Crossover {
      * @return An object containing an array with the offSprings
      * @throws JMException
      */
-    public Object execute(Object object, CITO_CAITO problem) throws JMException {
+    public Object execute(Object object, Problem problem) throws JMException {
         Solution[] parents = (Solution[]) object;
         Double crossoverProbability;
 

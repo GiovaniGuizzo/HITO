@@ -113,7 +113,7 @@ public class Solution implements Serializable {
      * @param problem The problem to solve
      * @throws ClassNotFoundException
      */
-    public Solution(CITO_CAITO problem) throws ClassNotFoundException {
+    public Solution(Problem problem) throws ClassNotFoundException {
         problem_ = problem;
         type_ = problem.getSolutionType();
         numberOfObjectives_ = problem.getNumberOfObjectives();
@@ -126,7 +126,7 @@ public class Solution implements Serializable {
         distanceToSolutionSet_ = Double.POSITIVE_INFINITY;
         //<-
 
-        variable_ = problem.solutionType_.createVariables(problem.getConstraintMatrix());
+        variable_ = problem.solutionType_.createVariables();
     } // Solution
 
     static public Solution getNewSolution(CITO_CAITO problem) throws ClassNotFoundException {

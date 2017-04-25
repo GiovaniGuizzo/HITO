@@ -18,7 +18,7 @@ public class PermutationIncrementalSolutionType extends SolutionType {
         }
     }
 
-    public Variable[] createVariables(int[][] constraints) {
+    public Variable[] createVariables() {
         Variable[] variables = new Variable[problem_.getNumberOfVariables()];
 
         for (int var = 0; var < problem_.getNumberOfVariables(); var++) {

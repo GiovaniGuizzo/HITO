@@ -7,9 +7,9 @@
 package jmetal.base.operator.crossover;
 
 import java.util.Properties;
+import jmetal.base.Problem;
 import jmetal.base.Solution;
 import jmetal.base.variable.Permutation;
-import jmetal.problems.CITO_CAITO;
 import jmetal.util.Configuration;
 import jmetal.util.JMException;
 import jmetal.util.PseudoRandom;
@@ -86,7 +86,7 @@ public class PMXCrossover extends Crossover {
                         replacement1[i] = replacement2[i] = -1;
                     }
 
-//      STEP 3: Interchange   	
+//      STEP 3: Interchange
                     for (int i = cuttingPoint1; i <= cuttingPoint2; i++) {
                         offspring1Vector[i] = parent2Vector[i];
                         offspring2Vector[i] = parent1Vector[i];
@@ -139,7 +139,7 @@ public class PMXCrossover extends Crossover {
      * @param object An object containing an array of two solutions
      * @throws JMException
      */
-    public Object execute(Object object, CITO_CAITO problem) throws JMException {
+    public Object execute(Object object, Problem problem) throws JMException {
         Solution[] parents = (Solution[]) object;
         Double crossoverProbability;
 

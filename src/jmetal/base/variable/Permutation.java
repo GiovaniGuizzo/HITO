@@ -7,9 +7,8 @@
 package jmetal.base.variable;
 
 import java.util.ArrayList;
+import jmetal.base.Problem;
 import jmetal.base.Variable;
-import jmetal.problems.CITO_CAITO;
-import jmetal.util.Configuration.*;
 
 /**
  * Implements a permutation of integer decision variable
@@ -36,10 +35,10 @@ public class Permutation extends Variable {
 
     /**
      * Constructor
-     * @param size Length of the permutation
-     * This constructor has been contributed by Madan Sathe
+     *
+     * @param size Length of the permutation This constructor has been contributed by Madan Sathe
      */
-    public Permutation(CITO_CAITO problem, int var) {
+    public Permutation(Problem problem, int var) {
         size_ = problem.getLength(var);
         vector_ = new int[size_];
 
@@ -56,18 +55,17 @@ public class Permutation extends Variable {
         }
 
         //tratar restricoes de precedencia
-        vector_ = problem.tratarRestricoes(vector_, problem.getConstraintMatrix());
-
+//        vector_ = problem.tratarRestricoes(vector_, problem.getConstraintMatrix());
 //        System.out.print("Initialized: \n");
 //        for (int indexSolution = 0; indexSolution < size_; indexSolution++) {
 //            System.out.print(vector_[indexSolution] + " ");
 //        }
 //        System.out.println("\n");
-
     } // Constructor
 
     /**
      * Copy Constructor
+     *
      * @param permutation The permutation to copy
      */
     public Permutation(Permutation permutation) {
@@ -81,6 +79,7 @@ public class Permutation extends Variable {
 
     /**
      * Create an exact copy of the <code>Permutation</code> object.
+     *
      * @return An exact copy of the object.
      */
     public Variable deepCopy() {
@@ -89,6 +88,7 @@ public class Permutation extends Variable {
 
     /**
      * Returns the length of the permutation.
+     *
      * @return The length
      */
     public int getLength() {
@@ -97,6 +97,7 @@ public class Permutation extends Variable {
 
     /**
      * Returns a string representing the object
+     *
      * @return The string
      */
     @Override

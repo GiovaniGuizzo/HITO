@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import jmetal.base.Operator;
+import jmetal.base.Problem;
 import jmetal.base.Solution;
 import jmetal.base.operator.comparator.DominanceComparator;
 import jmetal.base.operator.crossover.Crossover;
 import jmetal.base.operator.mutation.Mutation;
-import jmetal.problems.CITO_CAITO;
 import jmetal.util.JMException;
 
 /**
@@ -232,7 +232,7 @@ public class LowLevelHeuristic extends Operator {
     }
 
     @Override
-    public Object execute(Object object, CITO_CAITO problem) throws JMException {
+    public Object execute(Object object, Problem problem) throws JMException {
         Solution[] parents = (Solution[]) object;
 
         Solution[] offSpring = (Solution[]) crossoverOperator.execute(parents, problem);
@@ -333,14 +333,14 @@ public class LowLevelHeuristic extends Operator {
     public double getMultiArmedBanditValue() {
         /*  KE LI code
         http://www.cs.cityu.edu.hk/~51888309/code/bandits.zip
-            
+
                 temp1 = 2 * Math.log(total_usage);
                 temp2 = temp1 / strategy_usage[i];
                 temp3 = Math.sqrt(temp2);
                 quality[i] = rewards[i] + scale_ * temp3;
-             */
+         */
         double a = 2 * Math.log(SUM_N);
-        double b = a /n;
+        double b = a / n;
         aux = Math.sqrt(b);
         return (double) q + c * aux;
     }

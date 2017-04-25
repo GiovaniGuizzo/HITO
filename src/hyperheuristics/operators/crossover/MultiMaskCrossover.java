@@ -6,10 +6,10 @@
 package hyperheuristics.operators.crossover;
 
 import java.util.Arrays;
+import jmetal.base.Problem;
 import jmetal.base.Solution;
 import jmetal.base.operator.crossover.Crossover;
 import jmetal.base.variable.Permutation;
-import jmetal.problems.CITO_CAITO;
 import jmetal.util.Configuration;
 import jmetal.util.JMException;
 import jmetal.util.PseudoRandom;
@@ -89,7 +89,7 @@ public class MultiMaskCrossover extends Crossover {
      * @param object An object containing an array of two solutions
      * @throws JMException
      */
-    public Object execute(Object object, CITO_CAITO problem) throws JMException {
+    public Object execute(Object object, Problem problem) throws JMException {
         Solution[] parents = (Solution[]) object;
         Double crossoverProbability;
 

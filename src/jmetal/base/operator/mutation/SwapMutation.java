@@ -1,23 +1,22 @@
 /**
  * SwapMutation.java
  * Class representing a swap mutation operator
+ *
  * @author Antonio J.Nebro
  * @version 1.0
  */
 package jmetal.base.operator.mutation;
 
 import java.util.Properties;
+import jmetal.base.Problem;
 import jmetal.base.Solution;
-import jmetal.base.variable.*;
+import jmetal.base.variable.Permutation;
 import jmetal.util.Configuration;
 import jmetal.util.JMException;
 import jmetal.util.PseudoRandom;
-import jmetal.problems.CITO_CAITO;
 
 /**
- * This class implements a swap mutation.
- * NOTE: the operator is applied to the first variable of the solutions, and 
- * the type of those variables must be <code>VariableType_.Permutation</code>.
+ * This class implements a swap mutation. NOTE: the operator is applied to the first variable of the solutions, and the type of those variables must be <code>VariableType_.Permutation</code>.
  */
 public class SwapMutation extends Mutation {
 
@@ -39,11 +38,12 @@ public class SwapMutation extends Mutation {
     //--------------------------------------------------------------------------
     /**
      * Performs the operation
+     *
      * @param probability Mutation probability
      * @param solution The solution to mutate
      * @throws JMException
      */
-    public void doMutation(double probability, Solution solution, CITO_CAITO problem) throws JMException {
+    public void doMutation(double probability, Solution solution, Problem problem) throws JMException {
         int permutation[];
         int permutationLength;
         try {
@@ -92,11 +92,12 @@ public class SwapMutation extends Mutation {
     //--------------------------------------------------------------------------
     /**
      * Executes the operation
+     *
      * @param object An object containing the solution to mutate
      * @return an object containing the mutated solution
      * @throws JMException
      */
-    public Object execute(Object object, CITO_CAITO problem) throws JMException {
+    public Object execute(Object object, Problem problem) throws JMException {
         Solution solution = (Solution) object;
 
         Double probability = (Double) getParameter("probability");

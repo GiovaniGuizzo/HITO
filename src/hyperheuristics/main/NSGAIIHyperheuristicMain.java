@@ -15,9 +15,7 @@ import jmetal.base.operator.crossover.CrossoverFactory;
 import jmetal.base.operator.mutation.Mutation;
 import jmetal.base.operator.mutation.MutationFactory;
 import jmetal.base.operator.selection.SelectionFactory;
-import jmetal.problems.CITO_CAITO;
-import jmetal.problems.Combined2Objetives;
-import jmetal.problems.Combined4Objectives;
+import jmetal.problems.ITO;
 import jmetal.util.JMException;
 
 public class NSGAIIHyperheuristicMain {
@@ -93,14 +91,7 @@ public class NSGAIIHyperheuristicMain {
             System.out.println();
 
             problems = new String[]{
-                "OO_MyBatis",
-                "OA_AJHsqldb",
-                "OA_AJHotDraw",
-                "OO_BCEL",
-                "OO_JHotDraw",
-                "OA_HealthWatcher",
-                "OA_TollSystems",
-                "OO_JBoss"
+                "Guava"
             };
 
             crossovers = new String[]{
@@ -120,15 +111,15 @@ public class NSGAIIHyperheuristicMain {
             crossoverProbability = 1;
             mutationProbability = 1;
             alpha = 1;
-            beta = 8D / populationSize * 0.125;
+            beta = 0.00005;
 
-            heuristicFunction = LowLevelHeuristic.MULTI_ARMED_BANDIT;
+            heuristicFunction = LowLevelHeuristic.CHOICE_FUNCTION;
 
             w = populationSize / 2;
             c = 5;
-            debug = true;
+            debug = false;
             executions = 10;
-            path = "experiment/NSGA-II/";
+            path = "experimentnew/NSGA-II/";
         }
 
         String[] temp = new String[mutations.length + 1];
@@ -161,14 +152,14 @@ public class NSGAIIHyperheuristicMain {
             String outputDirectory = path + numberOfObjectives + "objectives/" + heuristicFunction + "/" + problemName + "/";
             createDirectory(outputDirectory);
 
-            CITO_CAITO problem; // The problem to solve
+            ITO problem; // The problem to solve
             NSGAIIHyperheuristic algorithm; // The algorithm to use
             Operator selection; // Selection operator
 
             if (numberOfObjectives == 2) {
-                problem = new Combined2Objetives("problemas/" + problemName + ".txt");
+                problem = new ITO("problemas/" + problemName + ".txt");
             } else if (numberOfObjectives == 4) {
-                problem = new Combined4Objectives("problemas/" + problemName + ".txt");
+                problem = new ITO("problemas/" + problemName + ".txt");
             } else {
                 problem = null;
                 System.err.println("Wrong number of objectives (" + numberOfObjectives + "). Available values: 2 or 4.");
@@ -269,7 +260,7 @@ public class NSGAIIHyperheuristicMain {
                     for (int i = 0; i < executionTimesApplied.length; i++) {
                         allTimesApplied[i] += executionTimesApplied[i];
                     }
-                    
+
                     if (debug) {
                         algorithm.closeLowLevelHeuristicsRankPath();
                         algorithm.closeLowLevelHeuristicsTimePath();

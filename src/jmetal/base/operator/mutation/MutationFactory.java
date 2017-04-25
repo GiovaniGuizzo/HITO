@@ -7,7 +7,6 @@
 package jmetal.base.operator.mutation;
 
 import hyperheuristics.operators.mutation.SimpleInsertionMutation;
-import jmetal.base.operator.mutation.Mutation;
 import jmetal.util.Configuration;
 import jmetal.util.JMException;
 
@@ -33,8 +32,6 @@ public class MutationFactory {
             return new SimpleInsertionMutation();
         } else if (name.equalsIgnoreCase("SwapMutation")) {
             return new SwapMutation();
-        } else if (name.equalsIgnoreCase("SwapMutationIncremental")) {
-            return new SwapMutationIncremental();
         } else {
             Configuration.logger_.severe("Operator '" + name + "' not found ");
             Class cls = java.lang.String.class;
