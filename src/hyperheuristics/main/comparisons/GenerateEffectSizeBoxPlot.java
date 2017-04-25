@@ -95,7 +95,7 @@ public class GenerateEffectSizeBoxPlot {
                     double[] values = new double[executions];
 
                     for (int j = 0; j < executions; j++) {
-//                        hypervolumes[j] = calculator.calculateHypervolume(path + "EXECUTION_" + j + "/FUN.txt", objectives);
+//                        values[j] = calculator.calculateHypervolume(path + "EXECUTION_" + j + "/FUN.txt", objectives);
                         values[j] = calculator.calculateIGD(path + "EXECUTION_" + j + "/FUN.txt", objectives);
                     }
 

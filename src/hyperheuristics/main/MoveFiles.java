@@ -7,8 +7,8 @@ public class MoveFiles {
     public static void main(String[] args) {
         int objectives = 2;
         int executions = 30;
-        String moea = "nsgaii";
-        String newMoeaName = "NSGA-II";
+        String moea = "moeadd";
+        String newMoeaName = "MOEADD";
         File origin = new File("experiment/" + moea);
         File target = new File("experiment/" + objectives + "objectives/" + newMoeaName + "/");
         target.mkdir();

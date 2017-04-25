@@ -36,6 +36,7 @@ public class GeneratePlots {
 
         for (int numberOfObjectives : numberOfObjectivesArray) {
             for (String problem : problems) {
+                pointIndex = 0;
                 if (numberOfObjectives == 2) {
                     File inputScript = File.createTempFile("input", ".gnu");
                     inputScript.deleteOnExit();
