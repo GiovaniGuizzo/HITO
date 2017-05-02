@@ -12,27 +12,21 @@ public class GeneratePlots {
         String[] objectives = new String[]{"A", "O", "R", "P"};
 
         String[] problems = new String[]{
-            "OO_MyBatis",
-            "OA_AJHsqldb",
-            "OA_AJHotDraw",
-            "OO_BCEL",
-            "OO_JHotDraw",
-            "OA_HealthWatcher",
-            //                "OA_TollSystems",
-            "OO_JBoss"
+            "Guava"
         };
 
         int[] points = new int[]{1, 2, 4, 6, 8, 12, 14, 10};
         int pointIndex = 0;
 
         String[] heuristicFunctions = new String[]{
-            LowLevelHeuristic.CHOICE_FUNCTION,
-            LowLevelHeuristic.MULTI_ARMED_BANDIT,
-            LowLevelHeuristic.RANDOM,};
+            LowLevelHeuristic.CHOICE_FUNCTION
+//            LowLevelHeuristic.MULTI_ARMED_BANDIT,
+//            LowLevelHeuristic.RANDOM,
+        };
 
         String[] algorithms = new String[]{
-            "MOEA/DD",
-            "NSGA-II",};
+            "NSGA-II"
+        };
 
         for (int numberOfObjectives : numberOfObjectivesArray) {
             for (String problem : problems) {
@@ -41,7 +35,7 @@ public class GeneratePlots {
                     File inputScript = File.createTempFile("input", ".gnu");
                     inputScript.deleteOnExit();
                     try (FileWriter scriptWriter = new FileWriter(inputScript)) {
-                        File outputFile = new File("experiment/" + numberOfObjectives + "objectives/" + problem + ".png");
+                        File outputFile = new File("experimentnew/" + numberOfObjectives + "objectives/" + problem + ".png");
                         if (!outputFile.getParentFile().exists()) {
                             outputFile.getParentFile().mkdirs();
                         }
@@ -54,8 +48,8 @@ public class GeneratePlots {
                                 + "# PARETO #\n"
                                 + "##########\n"
                                 + "\n"
-                                + "set xlabel \"Objective 1\"\n"
-                                + "set ylabel \"Objective 2\"\n"
+                                + "set xlabel \"Operations\"\n"
+                                + "set ylabel \"Attributes\"\n"
                                 + "set pointsize 2\n")
                                 .append("set output '" + outputFile.getAbsolutePath() + "'\n")
                                 .append("plot");
@@ -65,8 +59,8 @@ public class GeneratePlots {
                                     .append(" using 1:2 title \"" + algorithm + "\" with points ls " + points[pointIndex++ % points.length] + ",");
                             if (!"MOEA/DD".equals(algorithm)) {
                                 for (String heuristicFunction : heuristicFunctions) {
-                                    scriptWriter.append(" \"experiment/" + algorithmNew + "/" + numberOfObjectives + "objectives/" + heuristicFunction + "/" + problem + "/FUN.txt\"")
-                                            .append(" using 1:2 title \"HITO-" + heuristicFunction.replaceAll("ChoiceFunction", "CF").replaceAll("MultiArmedBandit", "MAB").replaceAll("Random", "R") + "\" with points ls " + points[pointIndex++ % points.length] + ",");
+                                    scriptWriter.append(" \"experimentnew/" + algorithmNew + "/" + numberOfObjectives + "objectives/" + heuristicFunction + "/" + problem + "/FUN.txt\"")
+                                            .append(" using 1:2 title \"HITO\" with points ls " + points[pointIndex++ % points.length] + ",");
 //                                        .append(" using 1:2 title \"" + algorithm + "-" + heuristicFunction + "\"");
                                 }
                             }
@@ -81,7 +75,7 @@ public class GeneratePlots {
                     inputScript.delete();
                 } else {
                     for (int obj = 2; obj < numberOfObjectives; obj++) {
-                        File outputFile = new File("experiment/" + numberOfObjectives + "objectives/" + problem + "_" + (obj - 1) + ".gnu");
+                        File outputFile = new File("experimentnew/" + numberOfObjectives + "objectives/" + problem + "_" + (obj - 1) + ".gnu");
                         if (!outputFile.getParentFile().exists()) {
                             outputFile.getParentFile().mkdirs();
                         }
@@ -103,7 +97,7 @@ public class GeneratePlots {
                                     .append("splot");
                             for (String algorithm : algorithms) {
                                 for (String heuristicFunction : heuristicFunctions) {
-                                    scriptWriter.append(" \"experiment/" + algorithm + "/" + numberOfObjectives + "objectives/" + heuristicFunction + "/" + problem + "/FUN.txt\"")
+                                    scriptWriter.append(" \"experimentnew/" + algorithm + "/" + numberOfObjectives + "objectives/" + heuristicFunction + "/" + problem + "/FUN.txt\"")
                                             .append(" using 1:2:" + (obj + 1) + " title \"HITO-" + heuristicFunction.replaceAll("ChoiceFunction", "CF").replaceAll("MultiArmedBandit", "MAB") + "\",");
 //                                        .append(" using 1:2 title \"" + algorithm + "-" + heuristicFunction + "\"");
                                 }

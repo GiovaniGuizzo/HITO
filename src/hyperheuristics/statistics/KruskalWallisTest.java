@@ -43,6 +43,7 @@ public class KruskalWallisTest {
         script += "),each=" + size + "));";
         script += "\n";
         script += "result <- kruskal.test(ARRAY,categs)\n";
+        script += "print(result)\n";
         script += "m <- data.frame(result$statistic,result$p.value)\n";
         script += "pos_teste <- kruskalmc(ARRAY,categs)\n";
         script += "print(pos_teste)";
@@ -75,6 +76,7 @@ public class KruskalWallisTest {
 
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
+                    System.out.println(line);
                     if (line.contains(entry1 + "-" + entry2)
                             || line.contains(entry2 + "-" + entry1)) {
                         HashMap<String, Boolean> entry1Map = result.get(entry1);

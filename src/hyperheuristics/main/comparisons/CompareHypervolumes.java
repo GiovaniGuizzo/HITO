@@ -27,22 +27,15 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 public class CompareHypervolumes {
 
     public static int EXECUTIONS = 30;
-    public static String outpath = "experiment/";
+    public static String outpath = "experimentnew/";
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        int[] numberOfObjectivesArray = new int[]{2, 4};
+        int[] numberOfObjectivesArray = new int[]{2};
         String[] problems;
         if (args.length == 0) {
             problems = new String[]{
-                "OO_MyBatis",
-                "OA_AJHsqldb",
-                "OA_AJHotDraw",
-                "OO_BCEL",
-                "OO_JHotDraw",
-                "OA_HealthWatcher",
-                //                "OA_TollSystems",
-                "OO_JBoss"
+                "Guava"
             };
         } else {
             EXECUTIONS = Integer.parseInt(args[0]);
@@ -51,14 +44,13 @@ public class CompareHypervolumes {
         }
 
         String[] heuristicFunctions = new String[]{
-            LowLevelHeuristic.CHOICE_FUNCTION,
-            LowLevelHeuristic.MULTI_ARMED_BANDIT,
-            LowLevelHeuristic.RANDOM
+            LowLevelHeuristic.CHOICE_FUNCTION
+//            LowLevelHeuristic.MULTI_ARMED_BANDIT,
+//            LowLevelHeuristic.RANDOM
         };
 
         String[] algorithms = new String[]{
-            "NSGAII",
-            "MOEADD",};
+            "NSGA-II"};
 
         for (int numberOfObjectives : numberOfObjectivesArray) {
 //            hypervolumeComparison(problems, heuristicFunctions, numberOfObjectives, algorithms);
@@ -286,12 +278,12 @@ public class CompareHypervolumes {
                     double mecbaMeanHypervolume[] = new double[algorithms.length];
                     Arrays.fill(mecbaMeanHypervolume, 0D);
 
-                    double[][] hyperheuristicHypervolumes = new double[(algorithms.length - 1) * heuristicFunctions.length][EXECUTIONS];
+                    double[][] hyperheuristicHypervolumes = new double[algorithms.length * heuristicFunctions.length][EXECUTIONS];
                     for (double[] hyperheuristicHypervolume : hyperheuristicHypervolumes) {
                         Arrays.fill(hyperheuristicHypervolume, 0D);
                     }
 
-                    double[] hyperheuristicMeanHypervolumes = new double[(algorithms.length - 1) * heuristicFunctions.length];
+                    double[] hyperheuristicMeanHypervolumes = new double[algorithms.length * heuristicFunctions.length];
                     Arrays.fill(hyperheuristicMeanHypervolumes, 0D);
 
                     for (int i = 0; i < algorithms.length; i++) {

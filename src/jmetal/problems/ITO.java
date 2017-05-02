@@ -46,7 +46,7 @@ public class ITO extends Problem {
         int methodFitness = 0;
         int attributeFitness = 0;
 
-//        repairSolution(solution);
+        repairSolution(solution);
         Set<Integer> testedUnits = new HashSet<>();
         Set<Integer> emulatedMethods = new HashSet<>();
         Set<Integer> emulatedAttributes = new HashSet<>();
@@ -54,7 +54,6 @@ public class ITO extends Problem {
         for (int unit : variables) {
             testedUnits.add(unit);
 
-            System.out.println("Unit: " + unit);
             for (String methodDependency : methodMatrix.get(unit)) {
                 String[] dependency = methodDependency.split("\\.");
                 int dependentUnit = Integer.parseInt(dependency[0]);
@@ -103,7 +102,6 @@ public class ITO extends Problem {
                 for (String extendedUnit : extendedUnits) {
                     Integer extendedUnitId = Integer.parseInt(extendedUnit.trim());
                     if (!testedUnits.contains(extendedUnitId)) {
-                        testedUnits.remove(unit);
                         variablesList.remove(extendedUnitId);
                         variablesList.add(i, extendedUnitId);
                         decrement = true;
