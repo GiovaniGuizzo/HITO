@@ -19,9 +19,9 @@ public class GeneratePlots {
         int pointIndex = 0;
 
         String[] heuristicFunctions = new String[]{
-            LowLevelHeuristic.CHOICE_FUNCTION
-//            LowLevelHeuristic.MULTI_ARMED_BANDIT,
-//            LowLevelHeuristic.RANDOM,
+            LowLevelHeuristic.CHOICE_FUNCTION,
+            LowLevelHeuristic.MULTI_ARMED_BANDIT,
+            LowLevelHeuristic.RANDOM
         };
 
         String[] algorithms = new String[]{
@@ -50,6 +50,9 @@ public class GeneratePlots {
                                 + "\n"
                                 + "set xlabel \"Operations\"\n"
                                 + "set ylabel \"Attributes\"\n"
+                                + "set xrange [169:211]\n"
+                                + "set yrange [20:28]\n"
+                                + "unset grid\n"
                                 + "set pointsize 2\n")
                                 .append("set output '" + outputFile.getAbsolutePath() + "'\n")
                                 .append("plot");
@@ -60,7 +63,7 @@ public class GeneratePlots {
                             if (!"MOEA/DD".equals(algorithm)) {
                                 for (String heuristicFunction : heuristicFunctions) {
                                     scriptWriter.append(" \"experimentnew/" + algorithmNew + "/" + numberOfObjectives + "objectives/" + heuristicFunction + "/" + problem + "/FUN.txt\"")
-                                            .append(" using 1:2 title \"HITO\" with points ls " + points[pointIndex++ % points.length] + ",");
+                                            .append(" using 1:2 title \"HITO-" + heuristicFunction.replaceAll("ChoiceFunction", "CF").replaceAll("MultiArmedBandit", "MAB").replaceAll("Random", "R") + "\" with points ls " + points[pointIndex++ % points.length] + ",");
 //                                        .append(" using 1:2 title \"" + algorithm + "-" + heuristicFunction + "\"");
                                 }
                             }

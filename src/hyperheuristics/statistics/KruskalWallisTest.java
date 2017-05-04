@@ -8,6 +8,7 @@ package hyperheuristics.statistics;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,6 +64,10 @@ public class KruskalWallisTest {
         Process process = processBuilder.start();
         process.waitFor();
 
+        Files.lines(outputFile.toPath()).forEach((line) -> {
+            System.out.println(line);
+        });
+
         ArrayList<Map.Entry<String, double[]>> entrySets = new ArrayList<>(values.entrySet());
 
         HashMap<String, HashMap<String, Boolean>> result = new HashMap<>();
@@ -76,7 +81,6 @@ public class KruskalWallisTest {
 
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
-                    System.out.println(line);
                     if (line.contains(entry1 + "-" + entry2)
                             || line.contains(entry2 + "-" + entry1)) {
                         HashMap<String, Boolean> entry1Map = result.get(entry1);

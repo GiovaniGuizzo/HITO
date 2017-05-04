@@ -229,7 +229,6 @@ public class NSGAIIHyperheuristic extends Algorithm {
         Solution newSolution;
         for (int i = 0; i < populationSize; i++) {
             newSolution = new Solution(problem_);
-            System.out.println("Evaluations: " + evaluations);
             problem_.evaluate(newSolution);
             problem_.evaluateConstraints(newSolution);
             evaluations++;
@@ -269,7 +268,6 @@ public class NSGAIIHyperheuristic extends Algorithm {
 
                 i++;
                 evaluations += 2;
-                System.out.println("Evaluations: " + evaluations);
 
                 if (qDebugWriter != null) {
                     try {

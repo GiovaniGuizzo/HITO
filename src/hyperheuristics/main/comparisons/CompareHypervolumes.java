@@ -35,7 +35,14 @@ public class CompareHypervolumes {
         String[] problems;
         if (args.length == 0) {
             problems = new String[]{
-                "Guava"
+                "Guava",
+                "OO_MyBatis",
+                "OA_AJHsqldb",
+                "OA_AJHotDraw",
+                "OO_BCEL",
+                "OO_JHotDraw",
+                "OA_HealthWatcher",
+                "OO_JBoss"
             };
         } else {
             EXECUTIONS = Integer.parseInt(args[0]);
@@ -44,9 +51,9 @@ public class CompareHypervolumes {
         }
 
         String[] heuristicFunctions = new String[]{
-            LowLevelHeuristic.CHOICE_FUNCTION
-//            LowLevelHeuristic.MULTI_ARMED_BANDIT,
-//            LowLevelHeuristic.RANDOM
+            LowLevelHeuristic.CHOICE_FUNCTION,
+            LowLevelHeuristic.MULTI_ARMED_BANDIT,
+            LowLevelHeuristic.RANDOM
         };
 
         String[] algorithms = new String[]{
@@ -249,6 +256,7 @@ public class CompareHypervolumes {
                 tableString.append("\t\t\\midrule\n");
 
                 for (String problem : problems) {
+                    System.out.println("================= " + problem + " =================");
                     HypervolumeHandler hypervolumeHandler = new HypervolumeHandler();
 
                     for (String algorithm : algorithms) {

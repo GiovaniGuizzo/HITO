@@ -119,7 +119,7 @@ public class NSGAIIHyperheuristicMain {
             c = 5;
             debug = false;
             executions = 30;
-            path = "experimentnew/HITO/";
+            path = "experimentnew/NSGA-II/";
         }
 
         String[] temp = new String[mutations.length + 1];
