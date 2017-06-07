@@ -22,7 +22,7 @@ public class RandomSearch extends Algorithm {
 
     @Override
     public SolutionSet execute() throws JMException, ClassNotFoundException {
-        SolutionSet set = new SolutionSet();
+        SolutionSet set = new SolutionSet(maxEvaluations);
         for (int i = 0; i < maxEvaluations; i++) {
             Solution solution = new Solution(problem);
             problem.evaluate(solution);
