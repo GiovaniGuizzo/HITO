@@ -1,5 +1,9 @@
 package jmetal.problems;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import jmetal.base.Solution;
 import jmetal.base.variable.Permutation;
 import jmetal.util.JMException;
@@ -72,6 +76,35 @@ public class ITOTest {
         ito.evaluate(solution);
         Assert.assertEquals(3, solution.getObjective(0), 0.00001);
         Assert.assertEquals(3, solution.getObjective(1), 0.00001);
+    }
+
+    @Test
+    public void testObjectives3() throws ClassNotFoundException, JMException {
+        ITO ito = new ITO("problemas/Guava.txt");
+        HashMap<Integer, List<String>> attributeMatrix = ito.getAttributeMatrix();
+        HashMap<Integer, List<String>> methodMatrix = ito.getMethodMatrix();
+        HashMap<Integer, List<String>> extensionMatrix = ito.getExtensionMatrix();
+        HashSet<String> relationships = new HashSet<>();
+
+        getUnitsDependencies(attributeMatrix, relationships);
+        getUnitsDependencies(methodMatrix, relationships);
+        getUnitsDependencies(extensionMatrix, relationships);
+
+        System.out.println(relationships.size());
+    }
+
+    public void getUnitsDependencies(HashMap<Integer, List<String>> depMatrix, HashSet<String> relationships) throws NumberFormatException {
+        for (Map.Entry<Integer, List<String>> entry : depMatrix.entrySet()) {
+            Integer unit = entry.getKey();
+            List<String> dependentUnits = entry.getValue();
+            for (String dependentUnitString : dependentUnits) {
+                String[] dependency = dependentUnitString.split("\\.");
+                int dependentUnit = Integer.parseInt(dependency[0]);
+                if (!relationships.contains(unit + "/" + dependentUnit) && !relationships.contains(dependentUnit + "/" + unit)) {
+                    relationships.add(unit + "/" + dependentUnit);
+                }
+            }
+        }
     }
 
 }

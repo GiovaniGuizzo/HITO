@@ -25,7 +25,7 @@ public class NSGAIIMain {
 
         for (String filename : softwares) {
 
-            int runsNumber = 30;
+            int runsNumber = 100;
             int populationSize = 300;
             int maxEvaluations = 60000;
             double crossoverProbability = 0.95;

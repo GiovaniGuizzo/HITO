@@ -118,7 +118,7 @@ public class NSGAIIHyperheuristicMain {
             w = populationSize / 2;
             c = 5;
             debug = false;
-            executions = 30;
+            executions = 100;
             path = "experimentnew/NSGA-II/";
         }
 

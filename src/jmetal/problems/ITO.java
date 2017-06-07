@@ -162,6 +162,18 @@ public class ITO extends Problem {
         return getMapAsString(extensionMatrix);
     }
 
+    public HashMap<Integer, List<String>> getMethodMatrix() {
+        return new HashMap<>(methodMatrix);
+    }
+
+    public HashMap<Integer, List<String>> getAttributeMatrix() {
+        return new HashMap<>(attributeMatrix);
+    }
+
+    public HashMap<Integer, List<String>> getExtensionMatrix() {
+        return new HashMap<>(extensionMatrix);
+    }
+
     private String getMapAsString(HashMap<Integer, List<String>> map) {
         String result = "";
         for (Map.Entry<Integer, List<String>> entry : map.entrySet()) {
