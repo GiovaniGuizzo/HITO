@@ -35,14 +35,14 @@ public class GeneratePlots {
                     File inputScript = File.createTempFile("input", ".gnu");
                     inputScript.deleteOnExit();
                     try (FileWriter scriptWriter = new FileWriter(inputScript)) {
-                        File outputFile = new File("experimentnew/" + numberOfObjectives + "objectives/" + problem + ".png");
+                        File outputFile = new File("experiment/" + numberOfObjectives + "objectives/" + problem + ".png");
                         if (!outputFile.getParentFile().exists()) {
                             outputFile.getParentFile().mkdirs();
                         }
                         outputFile.createNewFile();
                         scriptWriter.append("set terminal png size 700,500\n"
                                 + "set grid\n"
-                                + "set key out\n"
+                                //                                + "set key out\n"
                                 + "\n"
                                 + "##########\n"
                                 + "# PARETO #\n"
@@ -50,8 +50,8 @@ public class GeneratePlots {
                                 + "\n"
                                 + "set xlabel \"Operations\"\n"
                                 + "set ylabel \"Attributes\"\n"
-                                + "set xrange [169:211]\n"
-                                + "set yrange [20:28]\n"
+                                //                                + "set xrange [169:211]\n"
+                                //                                + "set yrange [20:28]\n"
                                 + "unset grid\n"
                                 + "set pointsize 2\n")
                                 .append("set output '" + outputFile.getAbsolutePath() + "'\n")
@@ -60,9 +60,9 @@ public class GeneratePlots {
                             String algorithmNew = algorithm.replaceAll("-", "").replaceAll("\\/", "");
                             scriptWriter.append(" \"resultado/" + algorithmNew.toLowerCase().replaceAll("-", "") + "/" + problem + "_Comb_" + numberOfObjectives + "obj/All_FUN_" + algorithmNew.toLowerCase().replaceAll("-", "") + "-" + problem + "\"")
                                     .append(" using 1:2 title \"" + algorithm + "\" with points ls " + points[pointIndex++ % points.length] + ",");
-                            if (!"MOEA/DD".equals(algorithm)) {
+                            if (!"Random".equals(algorithm)) {
                                 for (String heuristicFunction : heuristicFunctions) {
-                                    scriptWriter.append(" \"experimentnew/" + algorithmNew + "/" + numberOfObjectives + "objectives/" + heuristicFunction + "/" + problem + "/FUN.txt\"")
+                                    scriptWriter.append(" \"experiment/" + algorithmNew + "/" + numberOfObjectives + "objectives/" + heuristicFunction + "/" + problem + "/FUN.txt\"")
                                             .append(" using 1:2 title \"HITO-" + heuristicFunction.replaceAll("ChoiceFunction", "CF").replaceAll("MultiArmedBandit", "MAB").replaceAll("Random", "R") + "\" with points ls " + points[pointIndex++ % points.length] + ",");
 //                                        .append(" using 1:2 title \"" + algorithm + "-" + heuristicFunction + "\"");
                                 }
@@ -78,7 +78,7 @@ public class GeneratePlots {
                     inputScript.delete();
                 } else {
                     for (int obj = 2; obj < numberOfObjectives; obj++) {
-                        File outputFile = new File("experimentnew/" + numberOfObjectives + "objectives/" + problem + "_" + (obj - 1) + ".gnu");
+                        File outputFile = new File("experiment/" + numberOfObjectives + "objectives/" + problem + "_" + (obj - 1) + ".gnu");
                         if (!outputFile.getParentFile().exists()) {
                             outputFile.getParentFile().mkdirs();
                         }

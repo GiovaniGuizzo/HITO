@@ -26,8 +26,8 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
  */
 public class CompareHypervolumes {
 
-    public static int EXECUTIONS = 30;
-    public static String outpath = "experimentnew/";
+    public static int EXECUTIONS = 100;
+    public static String outpath = "experiment/";
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
@@ -35,14 +35,7 @@ public class CompareHypervolumes {
         String[] problems;
         if (args.length == 0) {
             problems = new String[]{
-                "Guava",
-                "OO_MyBatis",
-                "OA_AJHsqldb",
-                "OA_AJHotDraw",
-                "OO_BCEL",
-                "OO_JHotDraw",
-                "OA_HealthWatcher",
-                "OO_JBoss"
+                "Guava"
             };
         } else {
             EXECUTIONS = Integer.parseInt(args[0]);
@@ -73,7 +66,7 @@ public class CompareHypervolumes {
         try (FileWriter fileWriter = new FileWriter(outputDirectory + "TABLES_" + numberOfObjectives + ".txt")) {
 
             StringBuilder tableString = new StringBuilder();
-            DecimalFormat decimalFormatter = new DecimalFormat("0.00E0");
+            DecimalFormat decimalFormatter = new DecimalFormat("0.00");
             StandardDeviation standardDeviation = new StandardDeviation();
 
 //            pfKnown:
@@ -234,7 +227,7 @@ public class CompareHypervolumes {
                         + "\t\\begin{tabulary}{\\textwidth}{c");
                 for (String algorithm : algorithms) {
                     tableString.append("c");
-                    if (!"MOEADD".equals(algorithm)) {
+                    if (!"Random".equals(algorithm)) {
                         for (String heuristicFunction : heuristicFunctions) {
                             tableString.append("c");
                         }
@@ -246,7 +239,7 @@ public class CompareHypervolumes {
 
                 for (String algorithm : algorithms) {
                     tableString.append(" & \\textbf{" + algorithm + "}");
-                    if (!"MOEADD".equals(algorithm)) {
+                    if (!"Random".equals(algorithm)) {
                         for (String heuristicFunction : heuristicFunctions) {
                             tableString.append(" & \\textbf{" + algorithm + "-" + heuristicFunction + "}");
                         }
@@ -266,7 +259,7 @@ public class CompareHypervolumes {
                             hypervolumeHandler.addParetoFront(mecbaDirectory + "FUN_" + algorithm.toLowerCase().replaceAll("-", "") + "-" + problem + "-" + i + ".NaoDominadas");
                         }
 
-                        if (!"MOEADD".equals(algorithm)) {
+                        if (!"Random".equals(algorithm)) {
                             for (String heuristicFunction : heuristicFunctions) {
                                 String path = outpath;
                                 path += algorithm + "/" + numberOfObjectives + "objectives/";
@@ -300,7 +293,7 @@ public class CompareHypervolumes {
                         for (int j = 0; j < EXECUTIONS; j++) {
                             mecbaHypervolumes[i][j] = hypervolumeHandler.calculateHypervolume(mecbaDirectory + "FUN_" + algorithm.toLowerCase().replaceAll("-", "") + "-" + problem + "-" + j + ".NaoDominadas", numberOfObjectives);
                             mecbaMeanHypervolume[i] += mecbaHypervolumes[i][j];
-                            if (!"MOEADD".equals(algorithm)) {
+                            if (!"Random".equals(algorithm)) {
                                 for (int k = 0; k < heuristicFunctions.length; k++) {
                                     String path = outpath;
                                     path += algorithm + "/" + numberOfObjectives + "objectives/";
@@ -365,7 +358,7 @@ public class CompareHypervolumes {
                         if (algorithm.equals(maxHeuristic) || !result.get(algorithm).get(maxHeuristic)) {
                             tableString.append("}");
                         }
-                        if (!"MOEADD".equals(algorithm)) {
+                        if (!"Random".equals(algorithm)) {
                             for (int j = 0; j < heuristicFunctions.length; j++) {
                                 String heuristicFunction = algorithm + heuristicFunctions[j];
                                 tableString.append(" & ");
